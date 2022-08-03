@@ -7,6 +7,8 @@ urlpatterns = [
     path('drones/<int:id>/', DroneOperations.as_view(), name='drone_operations' ),
     
     path('medications/', MedicationsList.as_view(), name='medication_list' ),
+    path('medications/<int:id>', MedicationOperations.as_view(), name='medication_operations' ),
+    
     path('transportation/', TransportationList.as_view(), name='transportation_list' ),
     
 ]

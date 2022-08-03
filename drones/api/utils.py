@@ -24,7 +24,7 @@ class MixinsList:
         return Response(objSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
-class MixinObjects:
+class MixinOperations:
     model = None
     classSerializer = None
     

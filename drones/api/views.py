@@ -8,7 +8,7 @@ from rest_framework.response import Response
 
 from .models import Drone, Medication, Transportation
 from .serializers import DroneSerializer, MedicationSerializer, TransportationSerializer
-from .utils import MixinsList, MixinObjects
+from .utils import MixinOperations, MixinsList, MixinOperations
 
 # Create your views here.
 
@@ -16,11 +16,15 @@ class DronesList(MixinsList, APIView):
     model = Drone
     classSerializer = DroneSerializer
     
-class DroneOperations(MixinObjects ,APIView):
+class DroneOperations(MixinOperations ,APIView):
     model = Drone
     classSerializer = DroneSerializer
     
 class MedicationsList(MixinsList, APIView):
+    model = Medication
+    classSerializer = MedicationSerializer
+    
+class MedicationOperations(MixinOperations, APIView):
     model = Medication
     classSerializer = MedicationSerializer
     
