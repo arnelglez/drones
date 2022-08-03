@@ -8,11 +8,15 @@ from rest_framework.response import Response
 
 from .models import Drone, Medication, Transportation
 from .serializers import DroneSerializer, MedicationSerializer, TransportationSerializer
-from .mixins import MixinsList
+from .utils import MixinsList, MixinObjects
 
 # Create your views here.
 
 class DronesList(MixinsList, APIView):
+    model = Drone
+    classSerializer = DroneSerializer
+    
+class DroneOperations(MixinObjects ,APIView):
     model = Drone
     classSerializer = DroneSerializer
     
