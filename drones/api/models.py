@@ -41,8 +41,15 @@ class Medication(models.Model):
     
 class Transportation(models.Model):
     drone = models.ForeignKey(Drone, on_delete=models.CASCADE)
-    medications = models.ManyToManyField(Medication, related_name='medications')
-    amount = models.IntegerField()
+    status = models.BooleanField(default=1, null=True, blank=True)
+    
+    def __str__(self):
+        return self.drone
+    
+class TransportationMedication(models.Model):
+    transportation = models.ForeignKey(Transportation, on_delete=models.CASCADE)
+    medications = models.ForeignKey(Medication, on_delete=models.CASCADE)
+    amount = models.IntegerField(default=0)
     
     def __str__(self):
         return self.drone

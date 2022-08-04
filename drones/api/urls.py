@@ -10,5 +10,6 @@ urlpatterns = [
     path('medications/<int:id>/', MedicationOperations.as_view(), name='medication_operations' ),
     
     path('transportations/', TransportationList.as_view(), name='transportation_list' ),
+    path('transportations/<int:id>', TransportationOperations.as_view(), name='transportation_operations' ),
     
 ]

@@ -19,6 +19,7 @@ class DronesList(MixinsList, APIView):
     model = Drone
     classSerializer = DroneSerializer
     
+    # overwrites function post of MixinsList in utils.py
     def post(self, request):
         #verify that the weight matches the model
         data, errors = drone_weight_capacity(request.data)
@@ -36,37 +37,52 @@ class DronesList(MixinsList, APIView):
             return JsonResponse(objSerializer.errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
         return JsonResponse(errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
     
-class DroneOperations(APIView):    
-    def get(self, request, id):
-        # Search object by id
-        obj = get_object_or_404(self.model, id__iexact = id)
-        # serializes object
-        serializer = self.classSerializer(obj, many=False)
-        # show object
-        return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
-        
+class DroneOperations(MixinOperations ,APIView):      
+    model = Drone
+    classSerializer = DroneSerializer    
+    
+    # overwrites function put of MixinOperations in utils.py    
     def put(self, request, id):
         # Search object by id
-        obj = get_object_or_404(self.model, id__iexact = id)
-        
-        # serializes data entry
-        serializer = self.classSerializer(obj, data=request.data)
-        # verify if entry is valid
-        if(serializer.is_valid()):
-            # save entry               
-            serializer.save()     
-            # show object updated    
-            return JsonResponse(serializer.data, safe=False, status=status.HTTP_202_ACCEPTED)
-        # show errors because not save 
-        return JsonResponse(serializer.errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
+        #verify that the weight matches the model
+        data, errors = drone_weight_capacity(request.data)
+        # if there are errors return them
+        if errors.__len__() == 0:   
+            drone = get_object_or_404(Drone, id__iexact = id)
+            #search active transportation
+            trasnsportation = Transportation.objects.filter(drone=drone.id).filter(status=1).first()
+            
+            # serializes data entry
+            serializer = DroneSerializer(drone, data=data)
+            # verify if entry is valid
+            if(serializer.is_valid()):
+                # save entry               
+                serializer.save()    
+                # verifi transportation exist and drone state is 0 
+                if trasnsportation and serializer.state == 0:
+                    # transportation inactive
+                    trasnsportation.status = 0
+                    # save trasnsportation
+                    trasnsportation.save()
+                # show object updated    
+                return JsonResponse(serializer.data, safe=False, status=status.HTTP_202_ACCEPTED)
+            # show errors because not save 
+            return JsonResponse(serializer.errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse(errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
     
+    # overwrites function delete of MixinOperations in utils.py  
     def delete(self, request, id):
         # Search object by id
-        obj = get_object_or_404(self.model, id__iexact = id)   
-        # delete entry                 
-        obj.delete()    
-        # show blank object (deleted)   
-        return JsonResponse(safe=False, status=status.HTTP_204_NO_CONTENT)
+        drone = get_object_or_404(Drone, id__iexact = id)   
+        # if drone is not in use delete entry                 
+        if drone.state == 0:
+            drone.delete()   
+            # show blank object (deleted)   
+            return JsonResponse( {},safe=False, status=status.HTTP_204_NO_CONTENT)
+        else: 
+            # show blank object (deleted)   
+            return JsonResponse(_("Can't delete drone if is in use") ,safe=False, status=status.HTTP_401_UNAUTHORIZED)
+            
     
 class MedicationsList(MixinsList, APIView):
     model = Medication
@@ -77,13 +93,8 @@ class MedicationOperations(MixinOperations, APIView):
     classSerializer = MedicationSerializer
     
 class TransportationList(MixinsList, APIView):
-    def get(self, request):
-        # Search all objects of model
-        obj = Transportation.objects.all()
-        # serializes all object
-        serializers = TransportationSerializer(obj, many=True)
-        # Show list of object   
-        return JsonResponse(serializers.data, safe=False, status=status.HTTP_200_OK)
+    model = Transportation
+    classSerializer = TransportationSerializer
     
     # this function validate load max weight, battery level for drone use and if drone be disponible
     def weigth_load(self, data):
@@ -131,4 +142,7 @@ class TransportationList(MixinsList, APIView):
             # show errors because not save  
             return JsonResponse(objSerializer.errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
         return JsonResponse(errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
-    
+
+class TransportationOperations(MixinOperations, APIView):
+    model = Transportation
+    classSerializer = TransportationSerializer
