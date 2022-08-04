@@ -1,5 +1,9 @@
 from email.mime import image
 from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse
+
+from django.core.exceptions import ValidationError
+from django.utils.translation import  gettext_lazy as _
 
 # rest-framework api imports
 from rest_framework import status
@@ -29,23 +33,29 @@ class MedicationOperations(MixinOperations, APIView):
     classSerializer = MedicationSerializer
     
 class TransportationList(MixinsList, APIView):
-    def get(self, requst):
+    def get(self, request):
         # Search all objects of model
         obj = Transportation.objects.all()
         # serializes all object
         serializers = TransportationSerializer(obj, many=True)
-        # Show list of object
-        return Response(serializers.data, status=status.HTTP_200_OK)
+        # Show list of object   
+        return JsonResponse(serializers.data, safe=False, status=status.HTTP_200_OK)
+    
+
     
     def post(self, request):
         # serializes data entry
-        objSerializer = transserializers = TransportationSerializer(data=request.data)
+        objSerializer = TransportationSerializer(data=request.data)
         # verify if entry is valid
-        if objSerializer.is_valid(): 
+        if objSerializer.is_valid():             
             # save entry               
-            #objSerializer.save()
+            objSerializer.save()
+            drone = get_object_or_404(Drone ,objSerializer.data['drone'])
+            drone.state = 1
+            drone.save()
             # show object saved 
-            return Response(objSerializer.data, status=status.HTTP_201_CREATED)
+            return JsonResponse(objSerializer.data, safe=False, status=status.HTTP_201_CREATED)
+        
         # show errors because not save  
-        return Response(objSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse(objSerializer.errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
     

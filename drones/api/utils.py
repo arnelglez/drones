@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404
 # rest-framework api imports
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.response import Response
+from django.http import JsonResponse
 
 class MixinsList:
     model = None
@@ -15,7 +15,7 @@ class MixinsList:
         # serializes all object
         serializers = self.classSerializer(obj, many=True)
         # Show list of object
-        return Response(serializers.data, status=status.HTTP_200_OK)
+        return JsonResponse(serializers.data, safe=False, status=status.HTTP_200_OK)
     
     def post(self, request):
         # serializes data entry
@@ -25,9 +25,9 @@ class MixinsList:
             # save entry               
             objSerializer.save()
             # show object saved 
-            return Response(objSerializer.data, status=status.HTTP_201_CREATED)
+            return JsonResponse(objSerializer.data, safe=False, status=status.HTTP_201_CREATED)
         # show errors because not save  
-        return Response(objSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse(objSerializer.errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
     
 
 class MixinOperations:
@@ -40,7 +40,7 @@ class MixinOperations:
         # serializes object
         serializer = self.classSerializer(obj, many=False)
         # show object
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
         
     def put(self, request, id):
         # Search object by id
@@ -53,9 +53,9 @@ class MixinOperations:
             # save entry               
             serializer.save()     
             # show object updated    
-            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+            return JsonResponse(serializer.data, safe=False, status=status.HTTP_202_ACCEPTED)
         # show errors because not save 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse(serializer.errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
     
     def delete(self, request, id):
         # Search object by id
@@ -63,4 +63,4 @@ class MixinOperations:
         # delete entry                 
         obj.delete()    
         # show blank object (deleted)   
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return JsonResponse(safe=False, status=status.HTTP_204_NO_CONTENT)

@@ -41,9 +41,9 @@ class Medication(models.Model):
     
 class Transportation(models.Model):
     drone = models.ForeignKey(Drone, on_delete=models.CASCADE)
-    medications = models.ManyToManyField(Medication)
+    medications = models.ManyToManyField(Medication, related_name='medications')
     loadedDate = models.DateTimeField()
-    deliveredDate = models.DateTimeField(blank=True)
+    deliveredDate = models.DateTimeField(blank=True, null=True)
     
     def __str__(self):
         return self.drone
