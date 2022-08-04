@@ -9,8 +9,8 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .models import Drone, Medication, Transportation
-from .serializers import DroneSerializer, MedicationSerializer, TransportationSerializer
+from .models import Drone, Medication, Transportation, TransportationMedication
+from .serializers import DroneSerializer, MedicationSerializer, TransportationSerializer, TransportationMedicationSerializer
 from .utils import MixinOperations, MixinsList, MixinOperations, drone_weight_capacity
 
 # Create your views here.
@@ -121,7 +121,30 @@ class TransportationList(MixinsList, APIView):
         return data, errors, drone
     
     def post(self, request):
-        # verify state, wegth and battery
+        # serializes data entry
+        transMedList = request.data['medications']
+        transportationSerializer = TransportationSerializer(data=request.data)
+        # verify if entry is valid
+        if transportationSerializer.is_valid():  
+            # save entry  
+            #transportationSerializer.save()
+            
+            for transMed in transMedList:           
+                print(transportationSerializer.data)
+                print(get_object_or_404(Medication, transMed['medication']))
+                print(transMed['amount'])
+                '''transportationMedicationSerializer = TransportationMedicationSerializer(createTranspMed)
+                transportationMedicationSerializer.save()   '''         
+            # show object saved 
+            return JsonResponse(transportationSerializer.data, safe=False, status=status.HTTP_201_CREATED)
+            
+        # show errors because not save  
+        return JsonResponse(transportationSerializer.errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
+  
+        
+        
+        
+        '''# verify state, wegth and battery
         data, errors, drone = self.weigth_load(request.data)
         # verifies don't has errors
         if errors.__len__() == 0 :
@@ -141,7 +164,7 @@ class TransportationList(MixinsList, APIView):
             
             # show errors because not save  
             return JsonResponse(objSerializer.errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
-        return JsonResponse(errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse(errors, safe=False, status=status.HTTP_400_BAD_REQUEST)'''
 
 class TransportationOperations(MixinOperations, APIView):
     model = Transportation
@@ -170,4 +193,4 @@ class TransportationOperations(MixinOperations, APIView):
         # delete entry                 
         obj.delete()    
         # show blank object (deleted)   
-        return JsonResponse(safe=False, status=status.HTTP_204_NO_CONTENT)
+        return JsonResponse({},safe=False, status=status.HTTP_204_NO_CONTENT)

@@ -1,7 +1,7 @@
 
 from rest_framework import serializers
 from drf_extra_fields.fields import Base64ImageField
-from .models import Drone, Medication, Transportation
+from .models import Drone, Medication, Transportation, TransportationMedication
 
 class DroneSerializer(serializers.ModelSerializer):
     class Meta:
@@ -13,13 +13,16 @@ class MedicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Medication
         fields = ('name', 'weight','code', 'image')
-                
-class TransportationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Transportation
-        fields = '__all__'
-                
+
+
 class TransportationMedicationSerializer(serializers.ModelSerializer):
+    medication_name = serializers.ReadOnlyField(source="medication.name")    
+    class Meta:
+        model = TransportationMedication
+        fields = ('medication', 'amount', 'medication_name')
+
+class TransportationSerializer(serializers.ModelSerializer):
+    medications = TransportationMedicationSerializer(many=True, read_only=True ,source="transportationmedication_set")
     class Meta:
         model = Transportation
         fields = '__all__'
