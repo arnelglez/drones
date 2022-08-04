@@ -6,10 +6,10 @@ from .validators import *
 
 class Drone(models.Model):
     CHOISES_MODEL = (
-        (0 , 'Lightweight'),
-        (1 , 'Middleweight'),
-        (2 , 'Cruiserweight'),
-        (3 , 'Heavyweight')
+        (0 , 'Lightweight'), #weight up to 200g
+        (1 , 'Middleweight'), #weight up to 300g
+        (2 , 'Cruiserweight'), #weight up to 400g
+        (3 , 'Heavyweight') #weight up to 500g
     )
     
     CHOISES_STATE = (
