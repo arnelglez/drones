@@ -40,21 +40,13 @@ class MixinsList:
         return JsonResponse(serializers.data, safe=False, status=status.HTTP_200_OK)
     
     def post(self, request):
-        # verify class is Drone
-        if self.model.__name__.lower() == 'drone':
-            #verify that the weight matches the model, only for drones
-            data, errors = self.drone_weight_capacity(request.data)
-            # if there are errors return them
-            if errors.__len__() > 0:
-                return JsonResponse(errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            data = request.data
         # serializes data entry
-        objSerializer = self.classSerializer(data=data)
+        print(request.data)
+        objSerializer = self.classSerializer(data=request.data)
         # verify if entry is valid
         if objSerializer.is_valid(): 
             # save entry               
-            objSerializer.save()
+            objSerializer.save()    
             # show object saved 
             return JsonResponse(objSerializer.data, safe=False, status=status.HTTP_201_CREATED)
         # show errors because not save  
@@ -94,4 +86,4 @@ class MixinOperations:
         # delete entry                 
         obj.delete()    
         # show blank object (deleted)   
-        return JsonResponse(safe=False, status=status.HTTP_204_NO_CONTENT)
+        return JsonResponse({},safe=False, status=status.HTTP_204_NO_CONTENT)

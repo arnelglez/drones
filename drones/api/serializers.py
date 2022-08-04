@@ -18,3 +18,8 @@ class TransportationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transportation
         fields = '__all__'
+                
+class TransportationMedicationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transportation
+        fields = '__all__'

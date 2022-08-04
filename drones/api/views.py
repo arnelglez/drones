@@ -105,7 +105,7 @@ class TransportationList(MixinsList, APIView):
         for med in medications:
             medication = get_object_or_404(Medication, id = med)
             weight = medication.weight
-            amount = medication.amount
+            amount = med.amount
             totalWeight += weight * amount
             # if medicamentations weight more than drone can load raise error
         if drone.weight <= totalWeight:
@@ -146,3 +146,28 @@ class TransportationList(MixinsList, APIView):
 class TransportationOperations(MixinOperations, APIView):
     model = Transportation
     classSerializer = TransportationSerializer
+    
+    # overwrites function put of MixinOperations in utils.py   
+    def put(self, request, id):
+        # Search object by id
+        obj = get_object_or_404(Transportation, id__iexact = id)
+        
+        # serializes data entry
+        serializer = TransportationSerializer(obj, data=request.data)
+        # verify if entry is valid
+        if(serializer.is_valid()):
+            # save entry               
+            serializer.save()     
+            # show object updated    
+            return JsonResponse(serializer.data, safe=False, status=status.HTTP_202_ACCEPTED)
+        # show errors because not save 
+        return JsonResponse(serializer.errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
+    
+    # overwrites function delete of MixinOperations in utils.py   
+    def delete(self, request, id):
+        # Search object by id
+        obj = get_object_or_404(Transportation, id__iexact = id)   
+        # delete entry                 
+        obj.delete()    
+        # show blank object (deleted)   
+        return JsonResponse(safe=False, status=status.HTTP_204_NO_CONTENT)

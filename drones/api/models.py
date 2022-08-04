@@ -32,7 +32,7 @@ class Drone(models.Model):
 class Medication(models.Model):    
     name = models.CharField(max_length=150, validators=[name_medication]) #allowed only letters, numbers, ‘-‘, ‘_’);
     weight = models.FloatField()
-    code = models.CharField(max_length=150, validators=[code_medication]) #(allowed only upper case letters, underscore and numbers);
+    code = models.CharField(max_length=150, validators=[code_medication], unique=True), #(allowed only upper case letters, underscore and numbers);
     image = models.ImageField(null=True, upload_to='medication/', blank=True) #(picture of the medication case).
     
     
@@ -41,14 +41,15 @@ class Medication(models.Model):
     
 class Transportation(models.Model):
     drone = models.ForeignKey(Drone, on_delete=models.CASCADE)
+    medications = models.ManyToManyField(Medication, through='TransportationMedication', related_name='medications')
     status = models.BooleanField(default=1, null=True, blank=True)
     
     def __str__(self):
         return self.drone
     
 class TransportationMedication(models.Model):
-    transportation = models.ForeignKey(Transportation, on_delete=models.CASCADE)
-    medications = models.ForeignKey(Medication, on_delete=models.CASCADE)
+    transportation = models.ForeignKey(Transportation , on_delete=models.CASCADE)
+    medication = models.ForeignKey(Medication, on_delete=models.CASCADE)
     amount = models.IntegerField(default=0)
     
     def __str__(self):
