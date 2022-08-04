@@ -29,6 +29,23 @@ class MedicationOperations(MixinOperations, APIView):
     classSerializer = MedicationSerializer
     
 class TransportationList(MixinsList, APIView):
-    model = Transportation
-    classSerializer = TransportationSerializer
+    def get(self, requst):
+        # Search all objects of model
+        obj = Transportation.objects.all()
+        # serializes all object
+        serializers = TransportationSerializer(obj, many=True)
+        # Show list of object
+        return Response(serializers.data, status=status.HTTP_200_OK)
+    
+    def post(self, request):
+        # serializes data entry
+        objSerializer = transserializers = TransportationSerializer(data=request.data)
+        # verify if entry is valid
+        if objSerializer.is_valid(): 
+            # save entry               
+            #objSerializer.save()
+            # show object saved 
+            return Response(objSerializer.data, status=status.HTTP_201_CREATED)
+        # show errors because not save  
+        return Response(objSerializer.errors, status=status.HTTP_400_BAD_REQUEST)
     

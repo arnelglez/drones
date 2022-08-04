@@ -9,6 +9,6 @@ urlpatterns = [
     path('medications/', MedicationsList.as_view(), name='medication_list' ),
     path('medications/<int:id>', MedicationOperations.as_view(), name='medication_operations' ),
     
-    path('transportation/', TransportationList.as_view(), name='transportation_list' ),
+    path('transportations/', TransportationList.as_view(), name='transportation_list' ),
     
 ]
