@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from .models import Drone, Medication, Transportation, TransportationMedication
-from .serializers import DroneSerializer, MedicationSerializer, TransportationSerializer, TransportationMedicationSerializer
+from .serializers import DroneSerializer, DroneBatterySerializer, DroneMedicationSerializer ,MedicationSerializer, TransportationSerializer, TransportationMedicationSerializer
 from .utils import MixinOperations, MixinsList, MixinOperations, drone_weight_capacity
 
 # this function validate load max weight, battery level for drone use and if drone be disponible
@@ -108,8 +108,40 @@ class DroneOperations(MixinOperations ,APIView):
         else: 
             # show blank object (deleted)   
             return JsonResponse(_("Can't delete drone if is in use") ,safe=False, status=status.HTTP_401_UNAUTHORIZED)
-            
+
+class DronesAvailables(APIView):
+    def get(self, request):
+        # Search availables objects of model
+        drones = Drone.objects.filter(state = 0)
+        # serializes all object
+        serializers = DroneSerializer(drones, many=True)
+        # Show list of object
+        return JsonResponse(serializers.data, safe=False, status=status.HTTP_200_OK)            
     
+class DroneBatteryStatus(APIView):
+    def get(self, request, id):
+        # Search availables objects of model
+        drone = get_object_or_404(Drone, id=id)
+        # serializes all object
+        serializers = DroneBatterySerializer(drone, many=False)
+        # Show list of object
+        return JsonResponse(serializers.data, safe=False, status=status.HTTP_200_OK)    
+
+class DroneMedications(APIView):
+    def get(self, request, id):
+        # Search availables objects of model
+        drone = get_object_or_404(Drone, id=id)
+        # Search transportation active for this drone
+        transportation = Transportation.objects.filter(drone=drone.id).filter(status=True).first()
+        transMed = TransportationMedication.objects.filter(transportation = transportation)
+        # serializes all object
+        serializers = DroneMedicationSerializer(transMed, many=True)
+        # Show list of object
+        return JsonResponse(serializers.data, safe=False, status=status.HTTP_200_OK)  
+
+
+
+
 class MedicationsList(MixinsList, APIView):
     model = Medication
     classSerializer = MedicationSerializer
@@ -240,3 +272,6 @@ class TransportationOperations(MixinOperations, APIView):
             transportation.delete()    
             # show blank object (deleted)   
             return JsonResponse({},safe=False, status=status.HTTP_204_NO_CONTENT)
+
+
+        
