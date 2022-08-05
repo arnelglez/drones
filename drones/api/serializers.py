@@ -20,6 +20,11 @@ class TransportationMedicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = TransportationMedication
         fields = ('id', 'transportation', 'medication', 'amount', 'medication_name')     
+        extra_kwargs = {
+            'transportation' : {
+                'write_only' : True,
+            } 
+        }
 
 class TransportationSerializer(serializers.ModelSerializer):
     medications = TransportationMedicationSerializer(many=True, read_only=True ,source="transportationmedication_set")

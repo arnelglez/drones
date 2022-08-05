@@ -27,6 +27,7 @@ def drone_weight_capacity(data):
         errors.append(_("For model {} max weight is {}".format(drone_model_load(model), str((int(model)*100)+200) + 'g')))
     return data, errors
 
+
 class MixinsList:
     model = None
     classSerializer = None
