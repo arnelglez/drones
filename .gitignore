@@ -1,3 +1,4 @@
-env_dron
+env_dron/
 db.sqlite3
 manage.py
+static/
