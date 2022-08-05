@@ -103,13 +103,13 @@ class TransportationList(MixinsList, APIView):
         drone = get_object_or_404(Drone, id=data['drone'])
         medications = data['medications']
         for med in medications:
-            medication = get_object_or_404(Medication, id = med)
+            medication = get_object_or_404(Medication, id = med['medication'])
             weight = medication.weight
-            amount = med.amount
+            amount = med['amount']
             totalWeight += weight * amount
             # if medicamentations weight more than drone can load raise error
         if drone.weight <= totalWeight:
-            errors.append(_("This drone can't be load this weight, is max load is {}g".format(str(drone.weight))))
+            errors.append(_("This drone can't be load this weight {}g, is max load is {}g".format(str(totalWeight) ,str(drone.weight))))
         #if drone battery level is down 25% then raise error
         if drone.battery <= 25:
             errors.append(_("This drone can't be load with this battery level, minimum is 25{} and has {}".format('%', str(drone.battery)+'%')))
@@ -118,53 +118,49 @@ class TransportationList(MixinsList, APIView):
             errors.append(_("This drone is in use"))
         # else return object
         
-        return data, errors, drone
+        return data, errors, medications ,drone
     
     def post(self, request):
-        # serializes data entry
-        transMedList = request.data['medications']
-        transportationSerializer = TransportationSerializer(data=request.data)
-        # verify if entry is valid
-        if transportationSerializer.is_valid():  
-            # save entry  
-            #transportationSerializer.save()
-            
-            for transMed in transMedList:           
-                print(transportationSerializer.data)
-                print(get_object_or_404(Medication, transMed['medication']))
-                print(transMed['amount'])
-                '''transportationMedicationSerializer = TransportationMedicationSerializer(createTranspMed)
-                transportationMedicationSerializer.save()   '''         
-            # show object saved 
-            return JsonResponse(transportationSerializer.data, safe=False, status=status.HTTP_201_CREATED)
-            
-        # show errors because not save  
-        return JsonResponse(transportationSerializer.errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
-  
-        
-        
-        
-        '''# verify state, wegth and battery
-        data, errors, drone = self.weigth_load(request.data)
+        # verify state, wegth and battery
+        data, errors, transMedList, drone = self.weigth_load(request.data)
         # verifies don't has errors
-        if errors.__len__() == 0 :
+        if errors.__len__() == 0 :     
             # serializes data entry
-            objSerializer = TransportationSerializer(data=data)
+            transportationSerializer = TransportationSerializer(data=data)
             # verify if entry is valid
-            if objSerializer.is_valid():  
-                pass           
-                # save entry               
-                objSerializer.save()
+            if transportationSerializer.is_valid():              
+                # save entry  
+                transportationSerializer.save()
+                
                 # change drone state to loading
                 drone.state = 1
                 # save drone state
                 drone.save()
+                
+                # run transmed entraces to create json with this datas to save
+                for transMed in transMedList:                
+                    trans = transportationSerializer.data['id']                   
+                    medic = transMed['medication']
+                    amount = transMed['amount']
+                    
+                    # create json
+                    createTransMed = {
+                        "transportation" : trans,                    
+                        "medication" : medic,
+                        "amount" : amount,
+                        } 
+                    
+                    # serialize create json
+                    createTransMedSerializer = TransportationMedicationSerializer(data=createTransMed)
+                    if createTransMedSerializer.is_valid():
+                        # save data
+                        createTransMedSerializer.save()
                 # show object saved 
-                return JsonResponse(objSerializer.data, safe=False, status=status.HTTP_201_CREATED)
-            
+                return JsonResponse(transportationSerializer.data, safe=False, status=status.HTTP_201_CREATED)
+                
             # show errors because not save  
-            return JsonResponse(objSerializer.errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
-        return JsonResponse(errors, safe=False, status=status.HTTP_400_BAD_REQUEST)'''
+            return JsonResponse(transportationSerializer.errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse(errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
 
 class TransportationOperations(MixinOperations, APIView):
     model = Transportation

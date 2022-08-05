@@ -19,7 +19,7 @@ class TransportationMedicationSerializer(serializers.ModelSerializer):
     medication_name = serializers.ReadOnlyField(source="medication.name")    
     class Meta:
         model = TransportationMedication
-        fields = ('medication', 'amount', 'medication_name')
+        fields = ('id', 'transportation', 'medication', 'amount', 'medication_name')     
 
 class TransportationSerializer(serializers.ModelSerializer):
     medications = TransportationMedicationSerializer(many=True, read_only=True ,source="transportationmedication_set")
