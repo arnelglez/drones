@@ -262,13 +262,13 @@ class TransportationOperations(MixinOperations, APIView):
         # Search object by id
         transportation = get_object_or_404(Transportation, id__iexact = id)  
         # search drone for verify transportation state
-        drone = get_object_or_404(Drone, id=transportation.drone)
+        drone = get_object_or_404(Drone, id=transportation.drone.id)
         # verify: transportation do not begined
         if drone.state > 2:
             # show error: transportations in process cannot be deleted
             return JsonResponse(_('Transportations in process cannot be deleted'), safe=False, status=status.HTTP_400_BAD_REQUEST)
         else:     
-            # delete entry                 
+            # delete entry              
             transportation.delete()    
             # show blank object (deleted)   
             return JsonResponse({},safe=False, status=status.HTTP_204_NO_CONTENT)

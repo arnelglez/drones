@@ -42,7 +42,6 @@ class MixinsList:
     
     def post(self, request):
         # serializes data entry
-        print(request.data)
         objSerializer = self.classSerializer(data=request.data)
         # verify if entry is valid
         if objSerializer.is_valid(): 
