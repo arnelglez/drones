@@ -73,16 +73,6 @@ class DroneTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)   
         self.assertEqual(response.json()['battery'], 60)
        
-    #def test_list_drone_medication_list(self):
-        '''
-        Ensure we can check loaded medication items for a given dronee.
-        '''
-        '''url = 'drone_medications/3/'     
-        response = self.client.get(url, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)   
-        print(response.json())
-        #self.assertEqual(response.json()['battery'], 60)'''
-
 
 class MedicationTestCase(APITestCase):
     '''
@@ -166,7 +156,7 @@ class TransportationTestCase(APITestCase):
         TransportationMedication.objects.create(transportation = trans1, medication = med1, amount = "3")
         TransportationMedication.objects.create(transportation = trans1, medication = med2, amount = "5")
         TransportationMedication.objects.create(transportation = trans2, medication = med3, amount = "3") 
-        TransportationMedication.objects.create(transportation = trans2, medication = med3, amount = "2")
+        TransportationMedication.objects.create(transportation = trans3, medication = med3, amount = "2")
         TransportationMedication.objects.create(transportation = trans3, medication = med4, amount = "1")
         TransportationMedication.objects.create(transportation = trans3, medication = med1, amount = "3")
         TransportationMedication.objects.create(transportation = trans4, medication = med2, amount = "3")
@@ -224,3 +214,12 @@ class TransportationTestCase(APITestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Transportation.objects.count(), 3)
+        
+
+    def test_drone_medication_list(self):
+        '''
+        Ensure we can check loaded medication items for a given dronee.
+        '''
+        url = '/api/drone_medications/3/'     
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)   
