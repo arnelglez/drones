@@ -29,6 +29,12 @@ class Drone(models.Model):
     def __str__(self):
         return self.serial
     
+class DroneBatteryLog(models.Model):
+    drone = models.ForeignKey(Drone, on_delete=models.CASCADE)
+    battery = models.FloatField(validators=[batery_drone]); #capacity (percentage)    
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    
 class Medication(models.Model):    
     name = models.CharField(max_length=150, validators=[name_medication]) #allowed only letters, numbers, ‘-‘, ‘_’);
     weight = models.FloatField()

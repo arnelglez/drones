@@ -9,8 +9,8 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .models import Drone, Medication, Transportation, TransportationMedication
-from .serializers import DroneSerializer, DroneBatterySerializer, DroneMedicationSerializer ,MedicationSerializer, TransportationSerializer, TransportationMedicationSerializer
+from .models import Drone, Medication, Transportation, TransportationMedication, DroneBatteryLog
+from .serializers import DroneSerializer, DroneBatterySerializer, DroneMedicationSerializer ,MedicationSerializer, TransportationSerializer, TransportationMedicationSerializer, DroneBatteryLogSerializer
 from .utils import MixinOperations, MixinsList, MixinOperations, drone_weight_capacity
 
 
@@ -292,5 +292,59 @@ class TransportationOperations(MixinOperations, APIView):
             # show blank object (deleted)   
             return JsonResponse({},safe=False, status=status.HTTP_204_NO_CONTENT)
 
+class DroneBatteryLogList(MixinsList, APIView):
+    model = DroneBatteryLog
+    classSerializer = DroneBatteryLogSerializer
+    
+    def post(self, request):
+        '''
+        overwrites function create of MixinsList in utils.py for prevent users create a log 
+        '''
+        return JsonResponse(_('Drones battery level logs cannot be created'), safe=False, status=status.HTTP_400_BAD_REQUEST)
+    
+    def save_drone_batery_log(self):
+        '''
+        create drones battery logs 
+        '''
+        # search all drones
+        drones = Drone.objects.all()
+        # I tour all the drones
+        for drone in drones:   
+            # create json object         
+            createDroneBatteryLog = {
+                "drone" : drone.id,
+                "battery" : drone.battery
+            }
+            # serialize create json
+            createDroneBatteryLogSeralizer = DroneBatteryLogSerializer(data=createDroneBatteryLog)
+            if createDroneBatteryLogSeralizer.is_valid():
+                # save data
+                createDroneBatteryLogSeralizer.save()
+                
 
-        
+class DroneBatteryOperations(APIView):    
+    
+    def get(self, request, id):
+        '''
+        Function to list every log of drone
+        '''
+        # Search all objects of model
+        log = DroneBatteryLog.objects.filter(drone=id)
+        # serializes all object
+        serializers = DroneBatteryLogSerializer(log, many=True)
+        # Show list of object
+        return JsonResponse(serializers.data, safe=False, status=status.HTTP_200_OK)
+    
+    
+    def put(self, request, id):
+        '''
+        Block users to update logs
+        '''
+        return JsonResponse(_('Drones battery level logs cannot be updated'), safe=False, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+    def delete(self, request, id):
+        '''
+        Block users to delete a log 
+        '''
+        return JsonResponse(_('Drones battery level logs cannot be deleted'), safe=False, status=status.HTTP_400_BAD_REQUEST)

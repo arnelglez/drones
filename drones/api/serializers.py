@@ -1,7 +1,7 @@
 
 from rest_framework import serializers
 from drf_extra_fields.fields import Base64ImageField
-from .models import Drone, Medication, Transportation, TransportationMedication
+from .models import Drone, DroneBatteryLog, Medication, Transportation, TransportationMedication
 
 class DroneSerializer(serializers.ModelSerializer):
     '''
@@ -64,3 +64,17 @@ class TransportationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transportation
         fields = ('id', 'drone', 'status' ,'medications')
+
+class DroneBatteryLogSerializer(serializers.ModelSerializer):
+    '''
+    class DroneBatteryLog serializer
+    '''
+    class Meta:
+        model = DroneBatteryLog
+        fields = ('id', 'drone' , 'created_at', 'battery')
+        '''# include because transportation field is only to show, don't save 
+        extra_kwargs = {
+            'transportation' : {
+                'read_only' : True,
+            } 
+        }'''
