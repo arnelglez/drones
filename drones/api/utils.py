@@ -7,8 +7,11 @@ from rest_framework import status
 from rest_framework.views import APIView
 from django.http import JsonResponse
 
-# function to obtain model name by model index
+
 def drone_model_load(index):
+    '''
+    function to obtain model name by model index
+    '''
     if index == 0:
         result = 'Lightweight'
     elif index == 1:
@@ -17,8 +20,11 @@ def drone_model_load(index):
         result = 'Cruiserweight'
     return result
 
-# function to obtain max weight by model
+
 def drone_weight_capacity(data):
+    '''
+    function to obtain max weight by model
+    '''
     model = int(data['model'])
     weight = float(data['weight'])
     errors = []
@@ -33,6 +39,9 @@ class MixinsList:
     classSerializer = None
     
     def get(self, request):
+        '''
+        Mixin function to list every objects of any model
+        '''
         # Search all objects of model
         obj = self.model.objects.all()
         # serializes all object
@@ -41,6 +50,9 @@ class MixinsList:
         return JsonResponse(serializers.data, safe=False, status=status.HTTP_200_OK)
     
     def post(self, request):
+        '''
+        Mixin function to create object of any model
+        '''
         # serializes data entry
         objSerializer = self.classSerializer(data=request.data)
         # verify if entry is valid
@@ -58,6 +70,9 @@ class MixinOperations:
     classSerializer = None
     
     def get(self, request, id):
+        '''
+        Mixin function to show one objects of any model by his id
+        '''
         # Search object by id
         obj = get_object_or_404(self.model, id__iexact = id)
         # serializes object
@@ -66,6 +81,9 @@ class MixinOperations:
         return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
         
     def put(self, request, id):
+        '''
+        Mixin function to edit one objects of any model by his id
+        '''
         # Search object by id
         obj = get_object_or_404(self.model, id__iexact = id)
         
@@ -81,6 +99,9 @@ class MixinOperations:
         return JsonResponse(serializer.errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
     
     def delete(self, request, id):
+        '''
+        Mixin function to delete one objects of any model by his id
+        '''
         # Search object by id
         obj = get_object_or_404(self.model, id__iexact = id)   
         # delete entry                 
