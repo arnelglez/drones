@@ -331,9 +331,9 @@ class DroneBatteryOperations(APIView):
         Function to list every log of drone
         '''
         # Search all objects of model
-        log = DroneBatteryLog.objects.filter(drone=id)
+        logs = DroneBatteryLog.objects.filter(drone=id)
         # serializes all object
-        serializers = DroneBatteryLogSerializer(log, many=True)
+        serializers = DroneBatteryLogSerializer(logs, many=True)
         # Show list of object
         return JsonResponse(serializers.data, safe=False, status=status.HTTP_200_OK)
     
@@ -350,3 +350,22 @@ class DroneBatteryOperations(APIView):
         Block users to delete a log 
         '''
         return JsonResponse(_('Drones battery level logs cannot be deleted'), safe=False, status=status.HTTP_400_BAD_REQUEST)
+       
+    
+def drone_change_state(self, id):
+    '''
+    Update Drone state
+    '''
+    drone = get_object_or_404(Drone, id=id)
+    
+    if drone.state == 0:
+        return JsonResponse(_('Drones state cannot be updated'), safe=False, status=status.HTTP_400_BAD_REQUEST)
+    elif drone.state == 5:
+        drone.state = 0
+    else:
+        drone.state += 1
+    drone.save()
+    serializer = DroneSerializer(drone, many=False)
+    return JsonResponse( serializer.data, safe=False, status=status.HTTP_202_ACCEPTED)
+    
+ 

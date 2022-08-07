@@ -81,6 +81,18 @@ class DroneTestCase(APITestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)   
         self.assertEqual(response.json()['battery'], 60)
+        
+    def test_drone_change_state(self):
+        '''
+        Ensure we can change drone state for a given drone.
+        '''
+        url = '/api/drone_state/2/'    
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)   
+        self.assertEqual(response.json()['state'], 3)
+        
+        
+        
 
 class DroneBatteryLogTestCase(APITestCase):
     '''
