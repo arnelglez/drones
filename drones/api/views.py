@@ -352,7 +352,7 @@ class DroneBatteryOperations(APIView):
         return JsonResponse(_('Drones battery level logs cannot be deleted'), safe=False, status=status.HTTP_400_BAD_REQUEST)
        
     
-def drone_change_state(self, id):
+def drone_change_state(request, id):
     '''
     Update Drone state
     '''
