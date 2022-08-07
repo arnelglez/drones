@@ -4,7 +4,7 @@ from django.urls import reverse
 from rest_framework import  status
 from rest_framework.test import APITestCase
 
-from .models import Drone, Medication, Transportation, TransportationMedication
+from .models import Drone, DroneBatteryLog ,Medication, Transportation, TransportationMedication
 
 class DroneTestCase(APITestCase):
     '''
@@ -35,7 +35,16 @@ class DroneTestCase(APITestCase):
         '''
         response = self.client.get(reverse('drones_list'), format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(Drone.objects.count(), 4)        
+        self.assertEqual(Drone.objects.count(), 4)   
+    
+    def test_details_drone(self):
+        '''
+        Ensure we can show any drone details.
+        '''
+        url = '/api/drones/1/'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Drone.objects.first().serial, "1234567890")
     
     def test_edit_drone(self):
         '''
@@ -72,7 +81,70 @@ class DroneTestCase(APITestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)   
         self.assertEqual(response.json()['battery'], 60)
+
+class DroneBatteryLogTestCase(APITestCase):
+    '''
+    Class testing Drones
+    '''
+    def setUp(self):
+        '''
+        Init data in drones db
+        '''
+        drone1 = Drone.objects.create(serial = "1234567890", model = "0", weight = "199", battery = "70", state = "0")
+        drone2 = Drone.objects.create(serial = "1234567891", model = "1", weight = "285", battery = "60", state = "2")
+        drone3 = Drone.objects.create(serial = "1234567892", model = "2", weight = "393", battery = "50", state = "3")
+        drone4 = Drone.objects.create(serial = "1234567893", model = "3", weight = "470", battery = "30", state = "5")   
+        
+        DroneBatteryLog.objects.create(drone=drone1, battery=50) 
+        DroneBatteryLog.objects.create(drone=drone1, battery=40) 
+        DroneBatteryLog.objects.create(drone=drone1, battery=60)         
+        DroneBatteryLog.objects.create(drone=drone2, battery=60) 
+        DroneBatteryLog.objects.create(drone=drone3, battery=60) 
+        DroneBatteryLog.objects.create(drone=drone4, battery=60) 
+    
+    def test_create_log_fail(self):
+        '''
+        Ensure we can't create a new drone object.
+        '''
+        url = reverse('drones_battery_logs_list')
+        data = {"drone" : "1", "battery" : "70"}
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
        
+    def test_list_drones_logs(self):
+        '''
+        Ensure we can list all drones logs.
+        '''
+        response = self.client.get(reverse('drones_battery_logs_list'), format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(DroneBatteryLog.objects.count(), 6)    
+    
+    def test_details_drone_logs(self):
+        '''
+        Ensure we can show any drone logs details.
+        '''
+        url = '/api/drones_battery_logs/1/'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(DroneBatteryLog.objects.filter(drone=1).count(), 3)
+        
+    def test_edit_drone_log_fail(self):
+        '''
+        Ensure we can't edited any drone.
+        '''
+        url = '/api/drones_battery_logs/1/'
+        data = {"drone" : "1", "battery" : "70"}
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        
+    def test_delete_drone_log_fail(self):
+        '''
+        Ensure we can't delete any drone
+        '''
+        url = '/api/drones_battery_logs/1/'      
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)   
+           
 
 class MedicationTestCase(APITestCase):
     '''
@@ -107,7 +179,15 @@ class MedicationTestCase(APITestCase):
         response = self.client.get(reverse('medications_list'), format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Medication.objects.count(), 4)
-        
+    
+    def test_details_medication(self):
+        '''
+        Ensure we can show any medication details.
+        '''
+        url = '/api/medications/1/'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Medication.objects.first().code, "AA_55555_AA")       
     
     def test_edit_medication(self):
         '''
@@ -148,10 +228,10 @@ class TransportationTestCase(APITestCase):
         med3 = Medication.objects.create(name = "medications2", weight = "20", code = "AA_55555_AC", image = "myImage.jpg")
         med4 = Medication.objects.create(name = "medications3", weight = "18", code = "AA_55555_AD", image = "myImage.jpg")
         
-        trans1 = Transportation.objects.create(drone = drone1, status="1")   
+        trans1 = Transportation.objects.create(drone = drone4, status="1")   
         trans2 = Transportation.objects.create(drone = drone2, status="1")   
         trans3 = Transportation.objects.create(drone = drone3, status="1")   
-        trans4 = Transportation.objects.create(drone = drone4, status="1")   
+        trans4 = Transportation.objects.create(drone = drone1, status="1")   
                 
         TransportationMedication.objects.create(transportation = trans1, medication = med1, amount = "3")
         TransportationMedication.objects.create(transportation = trans1, medication = med2, amount = "5")
@@ -187,7 +267,15 @@ class TransportationTestCase(APITestCase):
         response = self.client.get(reverse('transportations_list'), format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(Transportation.objects.count(), 4)
-        
+    
+    def test_details_transportations(self):
+        '''
+        Ensure we can show any transportation details.
+        '''
+        url = '/api/transportations/1/'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(Transportation.objects.first().drone.serial, "1234567893")               
     
     def test_edit_transportation(self):
         '''
