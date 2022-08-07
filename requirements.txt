@@ -1,0 +1,5 @@
+APScheduler==3.9.1
+Django==4.0.7
+djangorestframework==3.13.1
+drf-extra-fields==3.4.0
+Pillow==9.2.0
