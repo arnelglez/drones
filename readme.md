@@ -1,8 +1,22 @@
 # Drones
 
-## Introduction 
+### Description
 
-There is a major new technology that is destined to be a disruptive force in the field of transportation: **the drone**. Just as the mobile phone allowed developing countries to leapfrog older technologies for personal communication, the drone has the potential to leapfrog traditional transportation infrastructure.
+Drones is a REST API created by Arnel González Rodríguez. This API is a small project propose by Musala Soft. This API was created with python and django framework using libraries as django rest framework, Pillow and  APscheduler.
 
-Useful drone functions include delivery of small items that are (urgently) needed in locations with difficult access.
+###  Requirements
+
+python 3.9.4
+APScheduler==3.9.1
+Django==4.0.7
+djangorestframework==3.13.1
+drf-extra-fields==3.4.0
+Pillow==9.2.0
+
+###### Linux Instalation
+
+```
+bash 
+
+```
 

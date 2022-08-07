@@ -26,7 +26,7 @@ class MedicationSerializer(serializers.ModelSerializer):
     image = Base64ImageField(required=False)
     class Meta:
         model = Medication
-        fields = ('name', 'code', 'weight', 'image')
+        fields = ( 'id', 'name', 'code', 'weight', 'image')
 
 
 class TransportationMedicationSerializer(serializers.ModelSerializer):

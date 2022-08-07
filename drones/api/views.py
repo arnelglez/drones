@@ -30,7 +30,7 @@ def weigth_load(data, id = None):
         totalWeight += weight * amount
         # if medicamentations weight more than drone can load raise error
     if drone.weight <= totalWeight:
-        errors.append(_("This drone can't be load this weight {}g, is max load is {}g".format(str(totalWeight) ,str(drone.weight))))
+        errors.append(_("This drone can't be load this weight {}g, is max load is {}g".format(str(round(totalWeight,2)) ,str(drone.weight))))
     #if drone battery level is down 25% then raise error
     if drone.battery <= 25:
         errors.append(_("This drone can't be load with this battery level, minimum is 25{} and has {}".format('%', str(drone.battery)+'%')))
@@ -308,18 +308,20 @@ class DroneBatteryLogList(MixinsList, APIView):
         '''
         # search all drones
         drones = Drone.objects.all()
-        # I tour all the drones
-        for drone in drones:   
-            # create json object         
-            createDroneBatteryLog = {
-                "drone" : drone.id,
-                "battery" : drone.battery
-            }
-            # serialize create json
-            createDroneBatteryLogSeralizer = DroneBatteryLogSerializer(data=createDroneBatteryLog)
-            if createDroneBatteryLogSeralizer.is_valid():
-                # save data
-                createDroneBatteryLogSeralizer.save()
+        # if there are drones in the database
+        if drones.__len__() > 0:
+            # I tour all the drones
+            for drone in drones:   
+                # create json object         
+                createDroneBatteryLog = {
+                    "drone" : drone.id,
+                    "battery" : drone.battery
+                }
+                # serialize create json
+                createDroneBatteryLogSeralizer = DroneBatteryLogSerializer(data=createDroneBatteryLog)
+                if createDroneBatteryLogSeralizer.is_valid():
+                    # save data
+                    createDroneBatteryLogSeralizer.save()
                 
 
 class DroneBatteryOperations(APIView):    
