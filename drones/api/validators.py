@@ -14,8 +14,10 @@ def serial_drone(value):
         
 def weight_drone(value):
     '''
-    validate drone weight field (weight limit (500gr max))
+    validate drone weight field (weight limit (500gr max) 0 min)
     '''
+    if value < 0:
+        raise ValidationError(_('Min weight is 0 g'))
     if value > 500:
         raise ValidationError(_('Max weght is 500 g'))
     return value

@@ -1,8 +1,23 @@
 # Drones
 
-### Description
+## Description
 
 Drones is a REST API created by Arnel González Rodríguez. This API is a small project propose by Musala Soft. This API was created with python and django framework using libraries as django rest framework, Pillow and  APscheduler.
+
+### Files uses
+
+`drones/api/drone_scheduler/drone_scheduler.py` This file contain tasks scheduler 
+`drones/api/apps.py`    This file contain function ready, begin task scheduler  
+`drones/api/models.py`  This file contain every models
+`drones/api/serializers.py` This file contain serializers uses in API
+`drones/api/tests.py`       This file contain Test functions
+`drones/api/urls.py`        This file contain api URL
+`drones/api/utils.py`       This file contain Mixins class and others functions
+`drones/api/validators.py`  This file contain fields validations
+`drones/api/views.py`       This file contain all views  
+
+`drones/drones/settings.py` This file contain project configurations
+`drones/drones/urls.py`     This file contain root URL
 
 ###  Requirements
 
@@ -13,7 +28,51 @@ Drones is a REST API created by Arnel González Rodríguez. This API is a small 
 `drf-extra-fields==3.4.0`
 `Pillow==9.2.0`
 
-##### JUnit tests
+### Data format
+
+#### Drone
+
+```json
+{
+    "id": auto, 
+    "serial": number 100 characters, 
+    "model": integer 0 - 3, 
+    "weight": float 0 - 100, 
+    "battery": float 0 - 100, 
+    "state": integer 0 - 5, 
+}
+```
+
+#### Medication
+
+```json
+{
+    "name" : allowed only letters, numbers, ‘-‘, ‘_’, 
+    "weight" : float number, 
+    "code" : allowed only upper case letters, underscore and numbers, 
+    "image" : image encode64
+}
+```
+
+#### Transportation
+
+```json
+{
+    "drone" : drone id (integer),
+    "medications" : 
+        [
+            # list of medications
+            { 
+                "medication": medication id (integer), 
+                "amount": integer 
+            }
+        ],
+    "status" : 0 - 1                
+}
+```
+
+
+#### JUnit tests
 
 Once python installed we need install requeriments.
 Run command
@@ -65,7 +124,7 @@ Destroying test database for alias 'default'...
 
 ```
 
-##### Local execution
+#### Local execution
 
 For local execution we have migrate ours model and start django local server, run commands.
 
@@ -80,7 +139,7 @@ python3 manage.py runserver
 Once server is start we have urls for all services, all urls are explain here
 
 
-##### URLs
+#### URLs
 
 ## Drones List
 
