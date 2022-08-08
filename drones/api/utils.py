@@ -4,6 +4,7 @@ from django.utils.translation import  gettext_lazy as _
 
 # rest-framework api imports
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.views import APIView
 from django.http import JsonResponse
 
