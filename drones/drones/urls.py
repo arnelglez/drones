@@ -20,11 +20,11 @@ from django.conf.urls.static import static
 from rest_framework_simplejwt.views import TokenRefreshView
 
 import api
-import accounts
+import users
 
 urlpatterns = [
     path('api/', include('api.urls')),
-    path('account/', include('accounts.urls')),
+    path('users/', include('users.urls')),
     #path('admin/', admin.site.urls),
     
     path('api-auth/token/refresh/',TokenRefreshView.as_view(), name='token_refresh'),
