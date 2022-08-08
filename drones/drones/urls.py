@@ -17,10 +17,15 @@ from django.contrib import admin
 from django.urls import path, include
 from . import settings
 from django.conf.urls.static import static
+from rest_framework_simplejwt.views import TokenRefreshView
 
 import api
+import accounts
 
 urlpatterns = [
     path('api/', include('api.urls')),
+    path('account/', include('accounts.urls')),
     #path('admin/', admin.site.urls),
+    
+    path('api-auth/token/refresh/',TokenRefreshView.as_view(), name='token_refresh'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

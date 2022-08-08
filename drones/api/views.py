@@ -7,7 +7,7 @@ from django.utils.translation import  gettext_lazy as _
 # rest-framework api imports
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.response import Response
+from rest_framework.permissions import IsAdminUser
 
 from .models import Drone, Medication, Transportation, TransportationMedication, DroneBatteryLog
 from .serializers import DroneSerializer, DroneBatterySerializer, DroneMedicationSerializer ,MedicationSerializer, TransportationSerializer, TransportationMedicationSerializer, DroneBatteryLogSerializer
@@ -356,19 +356,20 @@ def drone_change_state(request, id):
     '''
     Update Drone state
     '''
-    drone = get_object_or_404(Drone, id=id)
-    
-    # if drone state = 0 then need inicializating transportation
-    if drone.state == 0:
-        return JsonResponse(_('Drones state cannot be updated'), safe=False, status=status.HTTP_400_BAD_REQUEST)
-    # change state to next state
-    elif drone.state == 5:
-        drone.state = 0
-    # change state to idle
-    else:
-        drone.state += 1
-    drone.save()
-    serializer = DroneSerializer(drone, many=False)
-    return JsonResponse(serializer.data, safe=False, status=status.HTTP_202_ACCEPTED)
+    if request.method == 'POST':
+        drone = get_object_or_404(Drone, id=id)
+        
+        # if drone state = 0 then need inicializating transportation
+        if drone.state == 0:
+            return JsonResponse(_('Drones state cannot be updated'), safe=False, status=status.HTTP_400_BAD_REQUEST)
+        # change state to next state
+        elif drone.state == 5:
+            drone.state = 0
+        # change state to idle
+        else:
+            drone.state += 1
+        drone.save()
+        serializer = DroneSerializer(drone, many=False)
+        return JsonResponse(serializer.data, safe=False, status=status.HTTP_202_ACCEPTED)
     
  
