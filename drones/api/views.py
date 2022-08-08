@@ -358,14 +358,17 @@ def drone_change_state(request, id):
     '''
     drone = get_object_or_404(Drone, id=id)
     
+    # if drone state = 0 then need inicializating transportation
     if drone.state == 0:
         return JsonResponse(_('Drones state cannot be updated'), safe=False, status=status.HTTP_400_BAD_REQUEST)
+    # change state to next state
     elif drone.state == 5:
         drone.state = 0
+    # change state to idle
     else:
         drone.state += 1
     drone.save()
     serializer = DroneSerializer(drone, many=False)
-    return JsonResponse( serializer.data, safe=False, status=status.HTTP_202_ACCEPTED)
+    return JsonResponse(serializer.data, safe=False, status=status.HTTP_202_ACCEPTED)
     
  
