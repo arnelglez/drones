@@ -5,7 +5,7 @@ from django.utils.translation import  gettext_lazy as _
 # rest-framework api imports
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser
-from .decorators import method_permission_classes
+from drones.decorators import method_permission_classes
 from django.http import JsonResponse
 
 

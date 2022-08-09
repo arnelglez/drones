@@ -9,8 +9,8 @@ from django.contrib.auth import authenticate
 # rest-framework api imports
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAdminUser
-from .decorators import method_permission_classes
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from drones.decorators import method_permission_classes
 
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -20,16 +20,21 @@ from .serializers import UserSerializer, UserCustomSerializer, CustomTokenObtain
 
 
 class Login(TokenObtainPairView):
+    '''
+    Login
+    '''
     
     def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
-        
+        print(username, password)
+        # verify user authentication
         user = authenticate(
             username=username,
             password=password
         )
         
+        # if user authenticate
         if user:
             loginSerializer = CustomTokenObtainPairSerializer(data=request.data)
             if loginSerializer.is_valid():
@@ -44,7 +49,11 @@ class Login(TokenObtainPairView):
         
 
 class Logout(TokenObtainPairView):
-    
+    '''
+    Logout
+    '''
+    #permission_classes = [IsAuthenticated]
+        
     def post(self, request):
         user = User.objects.filter(id=request.data.get('user'))
         if user.exists():
@@ -52,8 +61,11 @@ class Logout(TokenObtainPairView):
             return JsonResponse(_('Successfully closed session'), safe=False, status=status.HTTP_200_OK) 
         return JsonResponse(_('User not exist'), safe=False, status=status.HTTP_400_BAD_REQUEST) 
         
-class Register(APIView):        
-    permission_classes = [IsAdminUser]
+class Register(APIView):       
+    '''
+    Create user.
+    '''
+    permission_classes = [IsAdminUser, IsAdminUser]
     
     def post(self, request):
         '''
@@ -67,19 +79,19 @@ class Register(APIView):
         last_name = request.data['last_name']
         email = request.data['email']
         is_staff = request.data['is_staff']
-        
+        # Verify passwords match
         if password1 == password2:
-            userCreate = User.objects.create(
-                {
-                    "password": password1,
-                    "is_superuser": is_superuser,
-                    "username": username,
-                    "first_name": first_name,
-                    "last_name": last_name,
-                    "email": email,
-                    "is_staff": is_staff
-                }
-            )
+            # creating json with user datas
+            userCreate = {
+                            "password": password1,
+                            "is_superuser": is_superuser,
+                            "username": username,
+                            "first_name": first_name,
+                            "last_name": last_name,
+                            "email": email,
+                            "is_staff": is_staff
+                        }
+            
             userSerializer = UserSerializer(data=userCreate)
             # verify if entry is valid
             if userSerializer.is_valid(): 
@@ -89,5 +101,5 @@ class Register(APIView):
                 return JsonResponse(userSerializer.data, safe=False, status=status.HTTP_201_CREATED)
             # show errors because not save  
             return JsonResponse(userSerializer.errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
-        return JsonResponse(_('Passwrds not mach'), safe=False, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse(_('Passwrds not match'), safe=False, status=status.HTTP_400_BAD_REQUEST)
     

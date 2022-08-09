@@ -16,8 +16,16 @@ Drones is a REST API created by Arnel González Rodríguez. This API is a small 
 `drones/api/validators.py`  This file contain fields validations
 `drones/api/views.py`       This file contain all views  
 
+`drones/users/serializers.py` This file contain serializers uses in API
+`drones/users/tests.py`       This file contain Test functions
+`drones/users/urls.py`        This file contain users URL
+`drones/users/utils.py`       This file contain Mixins class and others functions
+`drones/users/validators.py`  This file contain fields validations
+`drones/users/views.py`       This file contain all views  
+
 `drones/drones/settings.py` This file contain project configurations
 `drones/drones/urls.py`     This file contain root URL
+`drones/drones/decorators.py`  This file contain
 
 ###  Requirements
 
@@ -31,6 +39,21 @@ Drones is a REST API created by Arnel González Rodríguez. This API is a small 
 `Pillow==9.2.0`
 
 ### Data format
+
+#### User
+
+```json
+{ 
+    "password1": password,
+    "password2": confirm password,
+    "is_superuser":  boolean ( 1 "True" or 0 "False"),
+    "username": username,
+    "first_name": first name,
+    "last_name": last name,
+    "email": email,
+    "is_staff":  boolean ( 1 "True" or 0 "False")  
+}
+```
 
 #### Drone
 
@@ -68,7 +91,7 @@ Drones is a REST API created by Arnel González Rodríguez. This API is a small 
                 "amount": integer 
             }
         ],
-    "status" : 0 - 1                
+    "status" : boolean ( 1 "True" or 0 "False")                
 }
 ```
 
@@ -87,6 +110,13 @@ For test begin, run command
 ```bash
 python3 manage.py test
 ```
+If you want aply test for app, you can use. 
+
+```bash
+python3 manage.py test api
+python3 manage.py test users
+```
+
 
 Every test are begined with rigth data. If you want to try any validation only have to change var data and pass bad datas.
 
@@ -142,6 +172,86 @@ Once server is start we have urls for all services, all urls are explain here
 
 #### URLs
 
+## Login
+
+### Request
+
+`POST /login/`
+
+```bash
+    curl --header "Content-Type: application/json" \
+    --request POST \
+    --data '{"username" : "user1", "password" : "Pass123++"}' \
+    http://localhost:8000/login/
+```
+### Response
+
+```json
+{
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjYwMDg2ODg2LCJpYXQiOjE2NjAwODY1ODYsImp0aSI6Ijk0ZDdiZTM2ZTc0YTQzYmJhODY0Mzc5ZDM3MWVlMmMwIiwidXNlcl9pZCI6MX0.kO3-9P0AWcwamZ1XOgQggk_G4oCpNojU8XF67h4POjI", 
+    "referesh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTY2MDE3Mjk4NiwiaWF0IjoxNjYwMDg2NTg2LCJqdGkiOiJiN2JlMjFiOGRhYjA0NWQ4OWNlNTAzMWRhNzE0ZTZmMiIsInVzZXJfaWQiOjF9.cUosxG32Ac6QemsU1k2RR4WNDbIxDW3Pm_R0SXhuayA", 
+    "user": {
+                "id": 2, 
+                "username": "user1", 
+                "email": "user1z@email.com", 
+                "first_name": "User", 
+                "last_name": "Last Name"
+            }
+}
+```
+
+## Register
+
+### Request
+
+`POST /register/`
+
+```bash
+    curl --header "Authorization: Bearer <ACCESS_TOKEN>" \
+    --header "Content-Type: application/json" \
+    --request POST \
+    --data '{ "username" : "usertest", "password1" : "Prueba123+", "password2": "Prueba123+", "is_superuser":  "False", "first_name" : "Test", "last_name" : "User", "email" : "usertest@email.com", "is_staff":  "True" }' \
+    http://localhost:8000/register/
+```
+### Response
+
+```json
+{
+    "id": 4, 
+    "password": "Prueba123+", 
+    "last_login": null, 
+    "is_superuser": false, 
+    "username": "usertest", 
+    "first_name": "Test", 
+    "last_name": "User", 
+    "email": "usertest@email.com", 
+    "is_staff": true, 
+    "is_active": true, 
+    "date_joined": "2022-08-09T23:39:41.486247Z", 
+    "groups": [], 
+    "user_permissions": []
+}
+```
+
+## Logout
+
+### Request
+
+`POST /logout/`
+
+```bash
+    curl --header "Authorization: Bearer <ACCESS_TOKEN>" \
+    --header "Content-Type: application/json" \
+    --request POST \
+    --data '{"user" : "1"}' \
+    http://localhost:8000/logout/
+```
+### Response
+
+```json
+"Successfully closed session"
+```
+
 ## Drones List
 
 ### Request
@@ -149,7 +259,10 @@ Once server is start we have urls for all services, all urls are explain here
 `GET /api/drones/`
 
 ```bash
-curl -i -H 'Accept: application/json' http://localhost:8000/api/drones/
+    curl --header "Authorization: Bearer <ACCESS_TOKEN>" \ 
+    --header "Content-Type: application/json" \
+    --request GET \
+    http://localhost:8000/api/drones/
 ```
 ### Response
 
@@ -168,14 +281,14 @@ Referrer-Policy: same-origin
 Cross-Origin-Opener-Policy: same-origin
 
 [
-{
-    "id": 1, 
-    "serial": "123456760", 
-    "model": 0, 
-    "weight": 175.27, 
-    "battery": 50.0, 
-    "state": 1
-},
+    {
+        "id": 1, 
+        "serial": "123456760", 
+        "model": 0, 
+        "weight": 175.27, 
+        "battery": 50.0, 
+        "state": 1
+    },
     ...
 ]
 
@@ -187,10 +300,11 @@ Cross-Origin-Opener-Policy: same-origin
 `POST /api/drones/`
 
 ```bash
-curl --header "Content-Type: application/json" \
-  --request POST \
-  --data '{"serial" : "1234567895", "model" : "3", "weight" : "200", "battery" : "70", "state" : "0"}' \
-  http://localhost:8000/api/drones/
+    curl --header "Authorization: Bearer <ACCESS_TOKEN>" \ 
+    --header "Content-Type: application/json" \
+    --request POST \
+    --data '{"serial" : "1234567895", "model" : "3", "weight" : "200", "battery" : "70", "state" : "0"}' \
+    http://localhost:8000/api/drones/
 ```
 ### Response
 
@@ -212,9 +326,10 @@ curl --header "Content-Type: application/json" \
 `GET /api/drones/id/`
 
 ```bash
-curl --header "Content-Type: application/json" \
-  --request GET \
-  http://localhost:8000/api/drones/1/
+    curl --header "Authorization: Bearer <ACCESS_TOKEN>" \ 
+    --header "Content-Type: application/json" \
+    --request GET \
+    http://localhost:8000/api/drones/1/
 ```
 
 ### Response
@@ -249,10 +364,11 @@ Cross-Origin-Opener-Policy: same-origin
 `PUT /api/drones/id/`
 
 ```bash
-curl --header "Content-Type: application/json" \
-  --request PUT \
-  --data '{"serial" : "1234567895", "model" : "4", "weight" : "450", "battery" : "75", "state" : "0"}' \
-  http://localhost:8000/api/drones/11/
+    curl --header "Authorization: Bearer <ACCESS_TOKEN>" \ 
+    --header "Content-Type: application/json" \
+    --request PUT \
+    --data '{"serial" : "1234567895", "model" : "4", "weight" : "450", "battery" : "75", "state" : "0"}' \
+    http://localhost:8000/api/drones/11/
 ```
 ### Response
 
@@ -273,9 +389,10 @@ curl --header "Content-Type: application/json" \
 `DELETE /api/drones/id/`
 
 ```bash
-curl --header "Content-Type: application/json" \
-  --request DELETE \
-  http://localhost:8000/api/drones/11/
+    curl --header "Authorization: Bearer <ACCESS_TOKEN>" \ 
+    --header "Content-Type: application/json" \
+    --request DELETE \
+    http://localhost:8000/api/drones/11/
 ```
 ### Response
 
@@ -290,7 +407,10 @@ curl --header "Content-Type: application/json" \
 `GET /api/drones_availables/`
 
 ```bash
-curl -i -H 'Accept: application/json' http://localhost:8000/api/drones_availables/
+    curl --header "Authorization: Bearer <ACCESS_TOKEN>" \ 
+    --header "Content-Type: application/json" \
+    --request GET \
+    http://localhost:8000/api/drones_availables/
 ```
 
 ### Response
@@ -330,9 +450,10 @@ Cross-Origin-Opener-Policy: same-origin
 `GET /api/drone_battery/id/`
 
 ```bash
-curl --header "Content-Type: application/json" \
-  --request GET \
-  http://localhost:8000/api/drone_battery/5/
+    curl --header "Authorization: Bearer <ACCESS_TOKEN>" \ 
+    --header "Content-Type: application/json" \
+    --request GET \
+    http://localhost:8000/api/drone_battery/5/
 ```
 
 ### Response
@@ -352,9 +473,10 @@ curl --header "Content-Type: application/json" \
 `GET /api/drone_medications/id/`
 
 ```bash
-curl --header "Content-Type: application/json" \
-  --request GET \
-  http://localhost:8000/api/drone_medications/3/
+    curl --header "Authorization: Bearer <ACCESS_TOKEN>" \ 
+    --header "Content-Type: application/json" \
+    --request GET \
+    http://localhost:8000/api/drone_medications/3/
 ```
 
 ### Response
@@ -366,8 +488,8 @@ curl --header "Content-Type: application/json" \
         "id": 7, 
         "transportation": 3, 
         "medication": 1, 
-        "medication_name": 
-        "ibuprofen", "amount": 7
+        "medication_name": "ibuprofen", 
+        "amount": 7
     }, 
     {
         "id": 8, 
@@ -406,9 +528,10 @@ curl --header "Content-Type: application/json" \
 `POST /api/drone_state/id/`
 
 ```bash
-curl --header "Content-Type: application/json" \
-  --request POST \
-  http://localhost:8000/api/drone_state/2/
+    curl --header "Authorization: Bearer <ACCESS_TOKEN>" \ 
+    --header "Content-Type: application/json" \
+    --request POST \
+    http://localhost:8000/api/drone_state/2/
 ```
 
 ### Response
@@ -431,9 +554,10 @@ curl --header "Content-Type: application/json" \
 `GET /api/drones_battery_logs`
 
 ```bash
-curl --header "Content-Type: application/json" \
-  --request GET \
-  http://localhost:8000/api/drones_battery_logs/
+    curl --header "Authorization: Bearer <ACCESS_TOKEN>" \ 
+    --header "Content-Type: application/json" \
+    --request GET \
+    http://localhost:8000/api/drones_battery_logs/
 ```
 
 ### Response
@@ -456,16 +580,17 @@ curl --header "Content-Type: application/json" \
 ]
 ```
 
-## Drones batery logs
+## Drone batery logs
 
 ### Request
 
 `GET /api/drones_battery_logs/4/`
 
 ```bash
-curl --header "Content-Type: application/json" \
-  --request GET \
-  http://localhost:8000/api/drones_battery_logs/4/
+    curl --header "Authorization: Bearer <ACCESS_TOKEN>" \ 
+    --header "Content-Type: application/json" \
+    --request GET \
+    http://localhost:8000/api/drones_battery_logs/4/
 ```
 
 ### Response
@@ -495,7 +620,10 @@ curl --header "Content-Type: application/json" \
 `GET /api/medications/`
 
 ```bash
-curl -i -H 'Accept: application/json' http://localhost:8000/api/medications/
+    curl --header "Authorization: Bearer <ACCESS_TOKEN>" \ 
+    --header "Content-Type: application/json" \
+    --request GET \
+    http://localhost:8000/api/medications/
 ```
 ### Response
 
@@ -539,10 +667,11 @@ Cross-Origin-Opener-Policy: same-origin
 `POST /api/medications/`
 
 ```bash
-curl --header "Content-Type: application/json" \
-  --request POST \
-  --data '{"name" : "medications4", "weight" : "10", "code" : "FF_55555_DD", "image" : "/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBw4SEhMSExQTFRUWGBcZFxUYEx0YFxoWHBoZGBUYGBgYICogGRslHhcXIjIhJiorLjIyGB8zODMtNygtLi0BCgoKDg0OGxAQGy0lICMtLy8tMCstLS0wMi8tNi0tLS0tLS0vLS0tLS0tLS0tLy0tLS0tLS0tLS0tLS0tLS0tLf/AABEIAOEA4QMBIgACEQEDEQH/xAAcAAEAAQUBAQAAAAAAAAAAAAAABgECBAUHAwj/xABGEAABAwIDBQQGBgcHBAMAAAABAAIRAyEEEjEFEyJBUQZhgZEHFzJCU3EUkqGxwdEjM0NSYnPhFiRjcoKy8BWDk/E0wsP/xAAbAQEAAgMBAQAAAAAAAAAAAAAAAgMBBAUGB//EAD8RAAIBAgMDCQQHBwUBAAAAAAABAgMRBCFREjFBBRRhcYGRobHwE1LB0RUiMpKy4fEjJDNCYnKiFjRTguIG/9oADAMBAAIRAxEAPwDuKIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIqEqH7f2zW39GjSeW5qrWuIaDDWh1WtqP3GFs8i4c1VVrKmlfi0l1v5K7fQmyUY3v0ExRQT/u1KXFpNwLDKS32ZgubmMzcrxrdoKb4H0ekANz7ouKZkgmJhwDQegbzmFhmYwrJWtO398flwMqq7ZTyDL2cLgQGH2xOSBkgkzJJI0b1MedEbM3hzOq7vdm8E/pDmFpYDaQRIAsCb2Xi3tAzPmOHYeENDYbAh1Q24I/aA6asadOFe/9pKGUD6LSJykGWNAB0GSGzprP9S3mNiqlZKdv74/Isp09m5yXGtu4FwDY5nzcsuMuTkPa56qzE09lhlTK+qXZeGWkAuyzfg0LrajyXqO1TQI+j0YIu2AGl1uLLliZAN5uo3yR5FlOFSTe05L/snfw7yQYobLmnkLyASHzIlga4tJhs5iS2Y0gwDqrNps2aWv3LnteIyh2aHASXTLbEgAASLuuYErQqiyTVC1ntyy6e3PL0iqKiIXmRgaoZUpvMw1wcY1gOBMeS7Q94qU21adQPYYcCILT9muvSJXEF7YfFVac7t7mzrlcWz88pusxlY5+NwTxDUoys169bzrdXHsIc+rla1ly50QIIP3geQXMtmClicRUNXOGkVqgywHcLX1b5gRcNI+ZCzNg4RmJZWNY1KmTLGaqRkaWVC6sc1jlLWiDrnjUhSV3ZrAsFRwzU3tFXg3hkNDCAOt89N56hxGhhJNy3I0qMI4RyjKT2mrZcOOWd+OhTCdljSZUoirVaKraG8aA2HEF4eLiYa5r4gixvOib6s5uHdWxOJLmb97crmtLdy2qQ4gt4iW0iJJPtHkSskYDCOdUYyrXtiAxw37wJbiKQeRJvaqXEm+aSOq9BsylkzZ6tZ2QvFN1R9QXp7t3ACSSXb7loeixbTzIOttZyfglwt0+lbjdRLty2qatJ1SpUql1McVTK3QkOaAACyDMtsQZ11Ut9CY/wDknvpfc/8ANQ7tnhxTqUgM0Gi2M9QvdALhebNFrZSWkcTTBgTb0LDgxB/iZ/tP5pH7a9cGbGKf7h3fiOrIiLZPPBERAEREBHu1+whjKJolzmglplsTIMjVQX1WM+LU8gutqmUKLinvL6WKrUo7MJNI5L6rGfFqfVCeqxnxan1WrrWUJlCbEdCzn+J99nJfVYz4tT6oVfVaz4tXyaus5QmULGxHQc/xPvs5N6rWfFqeTU9VrPi1PqtXWcoTKE2I6Dn+J99nJvVaz4tT6rU9VzPi1PJq6zlCZQmxHQzz/E++zk3qtZ8Wr5NVPVaz4tTyC61lCZQmxHQxz/E++zkvqsZ8Wp9UJ6rGfFqfVC61lCZQs7EdBz/E++zkvqsZ8Wp9UJ6rGfFqfVC61lCZQmxHQzz/ABPvs5L6rGfFqfVCeqxnxan1QutZQmUJsR0HP8T77OS+qyn8Wr5D8lT1WU/i1PIfkut5QmULHs46D6QxPvs5L6rafxankPyVPVZT+LU8h+S63lCZQns46D6QxX/Izkvqsp/Fq+Q/JS7sT2XbgWva0udncHEuAGgi0KWZQgCyoRW4rqYutUjszk2iqIika4REQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQH/2Q=="}' \
-  http://localhost:8000/api/medications/
+    curl --header "Authorization: Bearer <ACCESS_TOKEN>" \ 
+    --header "Content-Type: application/json" \
+    --request POST \
+    --data '{"name" : "medications4", "weight" : "10", "code" : "FF_55555_DD", "image" : "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"}' \
+    http://localhost:8000/api/medications/
 ```
 ### Response
 
@@ -563,9 +692,10 @@ curl --header "Content-Type: application/json" \
 `GET /api/medications/id/`
 
 ```bash
-curl --header "Content-Type: application/json" \
-  --request GET \
-  http://localhost:8000/api/medications/1/
+    curl --header "Authorization: Bearer <ACCESS_TOKEN>" \ 
+    --header "Content-Type: application/json" \
+    --request GET \
+    http://localhost:8000/api/medications/1/
 ```
 
 ### Response
@@ -586,10 +716,11 @@ curl --header "Content-Type: application/json" \
 `PUT /api/medications/id/`
 
 ```bash
-curl --header "Content-Type: application/json" \
-  --request PUT \
-  --data '{"name" : "new_medication_name", "weight" : "12.5", "code" : "FF_5HH55_DD", "image" : "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"}' \
-  http://localhost:8000/api/medications/6/
+    curl --header "Authorization: Bearer <ACCESS_TOKEN>" \ 
+    --header "Content-Type: application/json" \
+    --request PUT \
+    --data '{"name" : "new_medication_name", "weight" : "12.5", "code" : "FF_5HH55_DD", "image" : "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"}' \
+    http://localhost:8000/api/medications/6/
 ```
 ### Response
 
@@ -609,9 +740,10 @@ curl --header "Content-Type: application/json" \
 `DELETE /api/medications/id/`
 
 ```bash
-curl --header "Content-Type: application/json" \
-  --request DELETE \
-  http://localhost:8000/api/medications/6/
+    curl --header "Authorization: Bearer <ACCESS_TOKEN>" \ 
+    --header "Content-Type: application/json" \
+    --request DELETE \
+    http://localhost:8000/api/medications/6/
 ```
 ### Response
 
@@ -626,7 +758,10 @@ curl --header "Content-Type: application/json" \
 `GET /api/transportations/`
 
 ```bash
-curl -i -H 'Accept: application/json' http://localhost:8000/api/transportations/
+    curl --header "Authorization: Bearer <ACCESS_TOKEN>" \ 
+    --header "Content-Type: application/json" \
+    --request GET \
+    http://localhost:8000/api/transportations/
 ```
 ### Response
 
@@ -709,10 +844,11 @@ Cross-Origin-Opener-Policy: same-origin
 `POST /api/transportations/`
 
 ```bash
-curl --header "Content-Type: application/json" \
-  --request POST \
-  --data '{ "drone":5, "medications":[{ "medication":2, "amount":3 }, { "medication":1, "amount":2 }], "status":1}' \
-  http://localhost:8000/api/transportations/
+    curl --header "Authorization: Bearer <ACCESS_TOKEN>" \ 
+    --header "Content-Type: application/json" \
+    --request POST \
+    --data '{ "drone":5, "medications":[{ "medication":2, "amount":3 }, { "medication":1, "amount":2 }], "status":1}' \
+    http://localhost:8000/api/transportations/
 ```
 ### Response
 
@@ -746,9 +882,10 @@ curl --header "Content-Type: application/json" \
 `GET /api/transportations/id/`
 
 ```bash
-curl --header "Content-Type: application/json" \
-  --request GET \
-  http://localhost:8000/api/transportations/5/
+    curl --header "Authorization: Bearer <ACCESS_TOKEN>" \ 
+    --header "Content-Type: application/json" \
+    --request GET \
+    http://localhost:8000/api/transportations/5/
 ```
 
 ### Response
@@ -782,10 +919,11 @@ curl --header "Content-Type: application/json" \
 `PUT /api/transportations/id/`
 
 ```bash
-curl --header "Content-Type: application/json" \
-  --request PUT \
-  --data '{ "drone":5, "medications":[{ "medication":1, "amount":2 }, { "medication":1, "amount":3 }], "status":1}' \
-  http://localhost:8000/api/transportations/6/
+    curl --header "Authorization: Bearer <ACCESS_TOKEN>" \ 
+    --header "Content-Type: application/json" \
+    --request PUT \
+    --data '{ "drone":5, "medications":[{ "medication":1, "amount":2 }, { "medication":1, "amount":3 }], "status":1}' \
+    http://localhost:8000/api/transportations/6/
 ```
 ### Response
 
@@ -818,9 +956,10 @@ curl --header "Content-Type: application/json" \
 `DELETE /api/transportations/id/`
 
 ```bash
-curl --header "Content-Type: application/json" \
-  --request DELETE \
-  http://localhost:8000/api/transportations/6/
+    curl --header "Authorization: Bearer <ACCESS_TOKEN>" \ 
+    --header "Content-Type: application/json" \
+    --request DELETE \
+    http://localhost:8000/api/transportations/6/
 ```
 ### Response
 

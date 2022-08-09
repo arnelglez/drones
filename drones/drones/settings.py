@@ -28,6 +28,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ORIGIN_WHITE_LIST = (
+    "*"
+    )
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -71,6 +78,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.locale.LocaleMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'drones.urls'

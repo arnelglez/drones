@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.decorators import permission_classes
-from .decorators import method_permission_classes
+from drones.decorators import method_permission_classes
 
 from .models import Drone, Medication, Transportation, TransportationMedication, DroneBatteryLog
 from .serializers import DroneSerializer, DroneBatterySerializer, DroneMedicationSerializer ,MedicationSerializer, TransportationSerializer, TransportationMedicationSerializer, DroneBatteryLogSerializer
