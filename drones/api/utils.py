@@ -4,8 +4,8 @@ from django.utils.translation import  gettext_lazy as _
 
 # rest-framework api imports
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from rest_framework.views import APIView
+from rest_framework.permissions import IsAdminUser
+from rest_framework.decorators import api_view, permission_classes
 from django.http import JsonResponse
 
 
@@ -43,6 +43,7 @@ class MixinsList:
         '''
         Mixin function to list every objects of any model
         '''
+        print(request.user)
         # Search all objects of model
         obj = self.model.objects.all()
         # serializes all object
@@ -50,6 +51,8 @@ class MixinsList:
         # Show list of object
         return JsonResponse(serializers.data, safe=False, status=status.HTTP_200_OK)
     
+    @api_view(['POST'])
+    @permission_classes([IsAdminUser])
     def post(self, request):
         '''
         Mixin function to create object of any model

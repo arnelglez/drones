@@ -10,6 +10,7 @@ from django.contrib.auth import authenticate
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAdminUser
+from rest_framework.decorators import api_view, permission_classes
 
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -45,10 +46,26 @@ class Login(TokenObtainPairView):
 class Logout(TokenObtainPairView):
     
     def post(self, request):
-        user = get_object_or_404(User, id=request.data.get('user'))
+        user = User.objects.filter(id=request.data.get('user'))
         if user.exists():
-            RefreshToken.for_user(user)
-            return JsonResponse(_('Seccion close correctly'), safe=False, status=status.HTTP_200_OK) 
+            RefreshToken.for_user(user.first())
+            return JsonResponse(_('Successfully closed session'), safe=False, status=status.HTTP_200_OK) 
         return JsonResponse(_('User not exist'), safe=False, status=status.HTTP_400_BAD_REQUEST) 
         
-        
+class Register(APIView):
+    
+    '''@api_view(['POST'])
+    @permission_classes([IsAdminUser])'''
+    def post(self, request):
+        '''
+        Register new user
+        '''
+        userSerializer = UserSerializer(data=request.data)
+        # verify if entry is valid
+        if userSerializer.is_valid(): 
+            # save entry               
+            userSerializer.save()
+            # show object saved 
+            return JsonResponse(userSerializer.data, safe=False, status=status.HTTP_201_CREATED)
+        # show errors because not save  
+        return JsonResponse(userSerializer.errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
