@@ -5,7 +5,7 @@ from django.utils.translation import  gettext_lazy as _
 # rest-framework api imports
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser
-from rest_framework.decorators import api_view, permission_classes
+from .decorators import method_permission_classes
 from django.http import JsonResponse
 
 
@@ -20,7 +20,6 @@ def drone_model_load(index):
     elif index == 2:
         result = 'Cruiserweight'
     return result
-
 
 def drone_weight_capacity(data):
     '''
@@ -43,7 +42,6 @@ class MixinsList:
         '''
         Mixin function to list every objects of any model
         '''
-        print(request.user)
         # Search all objects of model
         obj = self.model.objects.all()
         # serializes all object
@@ -51,9 +49,8 @@ class MixinsList:
         # Show list of object
         return JsonResponse(serializers.data, safe=False, status=status.HTTP_200_OK)
     
-    @api_view(['POST'])
-    @permission_classes([IsAdminUser])
-    def post(self, request):
+    @method_permission_classes([IsAdminUser])
+    def post(self, request):        
         '''
         Mixin function to create object of any model
         '''
@@ -84,6 +81,7 @@ class MixinOperations:
         # show object
         return JsonResponse(serializer.data, safe=False, status=status.HTTP_200_OK)
         
+    @method_permission_classes([IsAdminUser])
     def put(self, request, id):
         '''
         Mixin function to edit one objects of any model by his id
@@ -102,6 +100,7 @@ class MixinOperations:
         # show errors because not save 
         return JsonResponse(serializer.errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
     
+    @method_permission_classes([IsAdminUser])
     def delete(self, request, id):
         '''
         Mixin function to delete one objects of any model by his id

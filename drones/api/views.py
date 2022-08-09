@@ -7,7 +7,9 @@ from django.utils.translation import  gettext_lazy as _
 # rest-framework api imports
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.decorators import permission_classes
+from .decorators import method_permission_classes
 
 from .models import Drone, Medication, Transportation, TransportationMedication, DroneBatteryLog
 from .serializers import DroneSerializer, DroneBatterySerializer, DroneMedicationSerializer ,MedicationSerializer, TransportationSerializer, TransportationMedicationSerializer, DroneBatteryLogSerializer
@@ -69,8 +71,9 @@ def save_transportation_medication(transMedList, trans):
 class DronesList(MixinsList, APIView):    
     model = Drone
     classSerializer = DroneSerializer
+    permission_classes = [IsAuthenticated]
     
-    
+    @method_permission_classes([IsAdminUser])
     def post(self, request):
         '''
         overwrites function post of MixinsList in utils.py
@@ -93,9 +96,11 @@ class DronesList(MixinsList, APIView):
     
 class DroneOperations(MixinOperations ,APIView):      
     model = Drone
-    classSerializer = DroneSerializer    
+    classSerializer = DroneSerializer  
+    permission_classes = [IsAuthenticated]  
     
    
+    @method_permission_classes([IsAdminUser])
     def put(self, request, id):
         '''
         overwrites function put of MixinOperations in utils.py 
@@ -128,6 +133,7 @@ class DroneOperations(MixinOperations ,APIView):
         return JsonResponse(errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
     
      
+    @method_permission_classes([IsAdminUser])
     def delete(self, request, id):
         '''
         overwrites function delete of MixinOperations in utils.py 
@@ -144,6 +150,8 @@ class DroneOperations(MixinOperations ,APIView):
             return JsonResponse(_("Can't delete drone if is in use") ,safe=False, status=status.HTTP_401_UNAUTHORIZED)
 
 class DronesAvailables(APIView):
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request):
         '''
          check available drones for loading
@@ -159,6 +167,8 @@ class DroneBatteryStatus(APIView):
     '''
     check drone battery level for a given drone
     '''
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, id):
         # Search availables objects of model
         drone = get_object_or_404(Drone, id=id)
@@ -168,6 +178,8 @@ class DroneBatteryStatus(APIView):
         return JsonResponse(serializers.data, safe=False, status=status.HTTP_200_OK)    
 
 class DroneMedications(APIView):
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request, id):
         '''
         checking loaded medication items for a given drone
@@ -188,15 +200,19 @@ class DroneMedications(APIView):
 class MedicationsList(MixinsList, APIView):
     model = Medication
     classSerializer = MedicationSerializer
+    permission_classes = [IsAuthenticated]
     
 class MedicationOperations(MixinOperations, APIView):
     model = Medication
     classSerializer = MedicationSerializer
+    permission_classes = [IsAuthenticated]
     
 class TransportationList(MixinsList, APIView):
     model = Transportation
     classSerializer = TransportationSerializer
+    permission_classes = [IsAuthenticated]
     
+    @method_permission_classes([IsAdminUser])
     def post(self, request):
         '''
         overwrites function post of MixinsList in utils.py 
@@ -232,7 +248,9 @@ class TransportationList(MixinsList, APIView):
 class TransportationOperations(MixinOperations, APIView):
     model = Transportation
     classSerializer = TransportationSerializer
+    permission_classes = [IsAuthenticated]
        
+    @method_permission_classes([IsAdminUser])
     def put(self, request, id):
         '''
         overwrites function put of MixinOperations in utils.py
@@ -274,6 +292,7 @@ class TransportationOperations(MixinOperations, APIView):
             return JsonResponse(serializer.errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
         return JsonResponse(errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
       
+    @method_permission_classes([IsAdminUser])
     def delete(self, request, id):
         '''
         overwrites function delete of MixinOperations in utils.py 
@@ -295,7 +314,9 @@ class TransportationOperations(MixinOperations, APIView):
 class DroneBatteryLogList(MixinsList, APIView):
     model = DroneBatteryLog
     classSerializer = DroneBatteryLogSerializer
+    permission_classes = [IsAuthenticated]
     
+    @method_permission_classes([IsAdminUser])
     def post(self, request):
         '''
         overwrites function create of MixinsList in utils.py for prevent users create a log 
@@ -324,7 +345,8 @@ class DroneBatteryLogList(MixinsList, APIView):
                     createDroneBatteryLogSeralizer.save()
                 
 
-class DroneBatteryOperations(APIView):    
+class DroneBatteryOperations(APIView):  
+    permission_classes = [IsAuthenticated]  
     
     def get(self, request, id):
         '''
@@ -338,6 +360,7 @@ class DroneBatteryOperations(APIView):
         return JsonResponse(serializers.data, safe=False, status=status.HTTP_200_OK)
     
     
+    @method_permission_classes([IsAdminUser])
     def put(self, request, id):
         '''
         Block users to update logs
@@ -345,13 +368,14 @@ class DroneBatteryOperations(APIView):
         return JsonResponse(_('Drones battery level logs cannot be updated'), safe=False, status=status.HTTP_400_BAD_REQUEST)
     
     
+    @method_permission_classes([IsAdminUser])
     def delete(self, request, id):
         '''
         Block users to delete a log 
         '''
         return JsonResponse(_('Drones battery level logs cannot be deleted'), safe=False, status=status.HTTP_400_BAD_REQUEST)
        
-    
+@permission_classes([IsAdminUser])    
 def drone_change_state(request, id):
     '''
     Update Drone state

@@ -6,37 +6,11 @@ from rest_framework import  status
 from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
 
-import secrets
-
 from .models import Drone, DroneBatteryLog ,Medication, Transportation, TransportationMedication
 
 userModel = get_user_model()
 
-class UserTestCase(APITestCase):
-    '''
-    CLass testing Users
-    '''
-    def setUp(self):
-        '''
-        Init data in users db
-        '''
-        self.superuser = userModel.objects.create_superuser(username='superuser', email='superuser@email.com', password='superuser')
-        self.staffuser = userModel.objects.create_user(username='staffuser', email='staffuser@email.com', password='staffuser', is_staff=True)
-        self.normaluser = userModel.objects.create_user(username='normaluser', email='normaluser@email.com', password='normaluser')
-        self.normaluser1 = userModel.objects.create_user(username='normaluser1', email='normaluser1@email.com', password='normaluser1')
-        
-    def test_user_registration(self):
-        '''
-        Ensure we can create a new user.
-        '''
-        data = {
-            'username' : 'test',
-            'email' : 'test@email.com',
-            'first_name' : 'Test',
-            'last_name' : 'User',
-            'password' : secrets.token_urlsafe(10), # create ramdon pass
-        }
-        
+      
 
 class DroneTestCase(APITestCase):
     '''
@@ -50,6 +24,16 @@ class DroneTestCase(APITestCase):
         Drone.objects.create(serial = "1234567891", model = "1", weight = "285", battery = "60", state = "2")
         Drone.objects.create(serial = "1234567892", model = "2", weight = "393", battery = "50", state = "3")
         Drone.objects.create(serial = "1234567893", model = "3", weight = "470", battery = "30", state = "5")    
+        
+        userModel.objects.create_superuser(username='superuser', email='superuser@email.com', password='superuser')
+        
+        url = reverse('login')
+        data = {
+            "username" : "superuser",
+            "password" : "superuser"
+        }
+        response = self.client.post(url, data, format='json')
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + response.json()['token'])
     
     def test_create_drone(self):
         '''
@@ -145,6 +129,16 @@ class DroneBatteryLogTestCase(APITestCase):
         DroneBatteryLog.objects.create(drone=drone2, battery=60) 
         DroneBatteryLog.objects.create(drone=drone3, battery=60) 
         DroneBatteryLog.objects.create(drone=drone4, battery=60) 
+        
+        userModel.objects.create_superuser(username='superuser', email='superuser@email.com', password='superuser')
+        
+        url = reverse('login')
+        data = {
+            "username" : "superuser",
+            "password" : "superuser"
+        }
+        response = self.client.post(url, data, format='json')
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + response.json()['token'])
     
     def test_create_log_fail(self):
         '''
@@ -204,6 +198,16 @@ class MedicationTestCase(APITestCase):
         Medication.objects.create(name = "medications1", weight = "17", code = "AA_55555_AB", image = self.myImage)
         Medication.objects.create(name = "medications2", weight = "20", code = "AA_55555_AC", image = self.myImage)
         Medication.objects.create(name = "medications3", weight = "18", code = "AA_55555_AD", image = self.myImage)
+        
+        userModel.objects.create_superuser(username='superuser', email='superuser@email.com', password='superuser')
+        
+        url = reverse('login')
+        data = {
+            "username" : "superuser",
+            "password" : "superuser"
+        }
+        response = self.client.post(url, data, format='json')
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + response.json()['token'])
     
     
     def test_create_medication(self):
@@ -285,6 +289,16 @@ class TransportationTestCase(APITestCase):
         TransportationMedication.objects.create(transportation = trans3, medication = med1, amount = "3")
         TransportationMedication.objects.create(transportation = trans4, medication = med2, amount = "3")
         TransportationMedication.objects.create(transportation = trans4, medication = med3, amount = "4")
+        
+        userModel.objects.create_superuser(username='superuser', email='superuser@email.com', password='superuser')
+        
+        url = reverse('login')
+        data = {
+            "username" : "superuser",
+            "password" : "superuser"
+        }
+        response = self.client.post(url, data, format='json')
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + response.json()['token'])
             
     def test_create_transportation(self):
         '''
