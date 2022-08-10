@@ -6,26 +6,28 @@ Drones is a REST API created by Arnel González Rodríguez. This API is a small 
 
 ### Files uses
 
-`drones/api/drone_scheduler/drone_scheduler.py` This file contain tasks scheduler 
-`drones/api/apps.py`    This file contain function ready, begin task scheduler  
-`drones/api/models.py`  This file contain every models
-`drones/api/serializers.py` This file contain serializers uses in API
-`drones/api/tests.py`       This file contain Test functions
-`drones/api/urls.py`        This file contain api URL
-`drones/api/utils.py`       This file contain Mixins class and others functions
-`drones/api/validators.py`  This file contain fields validations
-`drones/api/views.py`       This file contain all api views  
+```
+drones/api/drone_scheduler/drone_scheduler.py   This file contain tasks scheduler 
+drones/api/apps.py                              This file contain function ready, begin task scheduler  
+drones/api/models.py                            This file contain every models
+drones/api/serializers.py                       This file contain serializers uses in API
+drones/api/tests.py                             This file contain Test functions
+drones/api/urls.py                              This file contain api URL
+drones/api/utils.py                             This file contain Mixins class and others functions
+drones/api/validators.py                        This file contain fields validations
+drones/api/views.py                             This file contain all api views  
 
-`drones/users/serializers.py` This file contain serializers uses in API
-`drones/users/tests.py`       This file contain Test functions
-`drones/users/urls.py`        This file contain users URL
-`drones/users/utils.py`       This file contain Mixins class and others functions
-`drones/users/validators.py`  This file contain fields validations
-`drones/users/views.py`       This file contain all users views  
+drones/users/serializers.py                     This file contain serializers uses in API
+drones/users/tests.py                           This file contain Test functions
+drones/users/urls.py                            This file contain users URL
+drones/users/utils.py                           This file contain Mixins class and others functions
+drones/users/validators.py                      This file contain fields validations
+drones/users/views.py                           This file contain all users views  
 
-`drones/drones/settings.py` This file contain project configurations
-`drones/drones/urls.py`     This file contain root URL
-`drones/drones/decorators.py`  This file contain one globaly function to get access
+drones/drones/settings.py                       This file contain project configurations
+drones/drones/urls.py                           This file contain root URL
+drones/drones/decorators.py                     This file contain one globaly function to get access
+```
 
 ###  Requirements
 
