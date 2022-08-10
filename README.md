@@ -29,14 +29,16 @@ Drones is a REST API created by Arnel González Rodríguez. This API is a small 
 
 ###  Requirements
 
-`python 3.9.4`
-`APScheduler==3.9.1`
-`Django==4.0.7`
-`djangorestframework==3.13.1`
-`djangorestframework-simplejwt==4.8.0`
-`django-cors-headers==3.13.0`
-`drf-extra-fields==3.4.0`
-`Pillow==9.2.0`
+```
+python 3.9.4
+APScheduler==3.9.1
+Django==4.0.7
+djangorestframework==3.13.1
+djangorestframework-simplejwt==4.8.0
+django-cors-headers==3.13.0
+drf-extra-fields==3.4.0
+Pillow==9.2.0
+```
 
 ### Data format
 
