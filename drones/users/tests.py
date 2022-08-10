@@ -63,3 +63,10 @@ class UserTestCase(APITestCase):
         self.assertEqual(userModel.objects.count(), 5)
         
         
+    def test_user_logout(self):
+        '''
+        Ensure we can clogout.
+        '''
+        url = reverse('logout')
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)     

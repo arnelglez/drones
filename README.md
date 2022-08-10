@@ -218,7 +218,6 @@ Once server is start we have urls for all services, all urls are explain here
 ```json
 {
     "id": 4, 
-    "password": "Prueba123+", 
     "last_login": null, 
     "is_superuser": false, 
     "username": "usertest", 
@@ -243,7 +242,6 @@ Once server is start we have urls for all services, all urls are explain here
     curl --header "Authorization: Bearer <ACCESS_TOKEN>" \
     --header "Content-Type: application/json" \
     --request POST \
-    --data '{"user" : "1"}' \
     http://localhost:8000/logout/
 ```
 ### Response

@@ -5,6 +5,7 @@ from django.http import JsonResponse
 from django.utils.translation import  gettext_lazy as _
 
 from django.contrib.auth import authenticate
+from django.contrib.auth.hashers import make_password
 
 # rest-framework api imports
 from rest_framework import status
@@ -18,6 +19,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth.models import User
 from .serializers import UserSerializer, UserCustomSerializer, CustomTokenObtainPairSerializer
 
+import jwt
+from drones.settings import  SIMPLE_JWT
 
 class Login(TokenObtainPairView):
     '''
@@ -27,7 +30,6 @@ class Login(TokenObtainPairView):
     def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
-        print(username, password)
         # verify user authentication
         user = authenticate(
             username=username,
@@ -47,25 +49,34 @@ class Login(TokenObtainPairView):
                 return JsonResponse(response, safe=False, status=status.HTTP_200_OK)
         return JsonResponse(_('failed username or password'), safe=False, status=status.HTTP_400_BAD_REQUEST)
         
-
+        
 class Logout(TokenObtainPairView):
     '''
     Logout
-    '''
-    #permission_classes = [IsAuthenticated]
-        
+    '''    
     def post(self, request):
-        user = User.objects.filter(id=request.data.get('user'))
+        # load headers
+        data = request.headers['Authorization']
+        # delete Bearer text
+        token = data.replace("Bearer ", "", 1)
+        # token clean
+        tokenJson = jwt.decode(
+            token,
+            SIMPLE_JWT['SIGNING_KEY'],
+            algorithms=[SIMPLE_JWT['ALGORITHM']],
+            )
+        user = User.objects.filter(id=tokenJson['user_id'])
         if user.exists():
             RefreshToken.for_user(user.first())
             return JsonResponse(_('Successfully closed session'), safe=False, status=status.HTTP_200_OK) 
-        return JsonResponse(_('User not exist'), safe=False, status=status.HTTP_400_BAD_REQUEST) 
+        return JsonResponse(_('User not exist'), safe=False, status=status.HTTP_400_BAD_REQUEST)
+            
         
 class Register(APIView):       
     '''
     Create user.
     '''
-    permission_classes = [IsAdminUser, IsAdminUser]
+    permission_classes = [IsAdminUser]
     
     def post(self, request):
         '''
@@ -83,7 +94,7 @@ class Register(APIView):
         if password1 == password2:
             # creating json with user datas
             userCreate = {
-                            "password": password1,
+                            "password": make_password(password1),
                             "is_superuser": is_superuser,
                             "username": username,
                             "first_name": first_name,
@@ -91,14 +102,13 @@ class Register(APIView):
                             "email": email,
                             "is_staff": is_staff
                         }
-            
             userSerializer = UserSerializer(data=userCreate)
             # verify if entry is valid
             if userSerializer.is_valid(): 
                 # save entry               
                 userSerializer.save()
                 # show object saved 
-                return JsonResponse(userSerializer.data, safe=False, status=status.HTTP_201_CREATED)
+                return JsonResponse('userSerializer.data', safe=False, status=status.HTTP_201_CREATED)
             # show errors because not save  
             return JsonResponse(userSerializer.errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
         return JsonResponse(_('Passwrds not match'), safe=False, status=status.HTTP_400_BAD_REQUEST)
