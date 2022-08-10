@@ -2,3 +2,4 @@ env_dron/
 db.sqlite3
 manage.py
 static/
+users_created.txt
