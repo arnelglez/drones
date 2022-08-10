@@ -53,7 +53,7 @@ class Login(TokenObtainPairView):
 class Logout(TokenObtainPairView):
     '''
     Logout
-    '''    
+    '''        
     def post(self, request):
         # load headers
         data = request.headers['Authorization']
@@ -113,3 +113,57 @@ class Register(APIView):
             return JsonResponse(userSerializer.errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
         return JsonResponse(_('Passwrds not match'), safe=False, status=status.HTTP_400_BAD_REQUEST)
     
+            
+        
+class ChangePassword(APIView):       
+    '''
+    Reset password.
+    '''    
+    permission_classes = [IsAuthenticated]
+    
+    def put(self, request):
+        '''
+        Register new user
+        '''
+        errors = []
+        # load headers
+        data = request.headers['Authorization']
+        # delete Bearer text
+        token = data.replace("Bearer ", "", 1)
+        # token clean
+        tokenJson = jwt.decode(
+            token,
+            SIMPLE_JWT['SIGNING_KEY'],
+            algorithms=[SIMPLE_JWT['ALGORITHM']],
+            )
+        users = User.objects.filter(id=tokenJson['user_id'])
+                    
+        password1 = request.data['password1']
+        password2 = request.data['password2']
+        # Verify passwords match
+        if password1 != password2:
+            errors.append(_('Passwrds not match'))
+        elif not users.exists():
+            errors.append(_('User not exist'))
+        else:
+            # creating json with user datas
+            user = users.first()
+            passCreate = {
+                            "password": make_password(password1),
+                            "is_superuser": user.is_superuser,
+                            "username": user.username,
+                            "first_name": user.first_name,
+                            "last_name": user.last_name,
+                            "email": user.email,
+                            "is_staff": user.is_staff
+                        }
+            userSerializer = UserSerializer(user, data=passCreate)
+            # verify if entry is valid
+            if userSerializer.is_valid(): 
+                # save entry               
+                userSerializer.save()
+                # show object saved 
+                return JsonResponse('userSerializer.data', safe=False, status=status.HTTP_202_ACCEPTED)
+            # show errors because not save  
+            return JsonResponse(userSerializer.errors, safe=False, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse(errors, safe=False, status=status.HTTP_400_BAD_REQUEST)

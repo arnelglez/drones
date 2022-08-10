@@ -14,18 +14,18 @@ Drones is a REST API created by Arnel González Rodríguez. This API is a small 
 `drones/api/urls.py`        This file contain api URL
 `drones/api/utils.py`       This file contain Mixins class and others functions
 `drones/api/validators.py`  This file contain fields validations
-`drones/api/views.py`       This file contain all views  
+`drones/api/views.py`       This file contain all api views  
 
 `drones/users/serializers.py` This file contain serializers uses in API
 `drones/users/tests.py`       This file contain Test functions
 `drones/users/urls.py`        This file contain users URL
 `drones/users/utils.py`       This file contain Mixins class and others functions
 `drones/users/validators.py`  This file contain fields validations
-`drones/users/views.py`       This file contain all views  
+`drones/users/views.py`       This file contain all users views  
 
 `drones/drones/settings.py` This file contain project configurations
 `drones/drones/urls.py`     This file contain root URL
-`drones/drones/decorators.py`  This file contain
+`drones/drones/decorators.py`  This file contain one globaly function to get access
 
 ###  Requirements
 
@@ -98,11 +98,15 @@ Drones is a REST API created by Arnel González Rodríguez. This API is a small 
 
 #### JUnit tests
 
-Once python installed we need install requeriments.
-Run command
+Once python installed we need install requeriments. Run command
 
 ```bash
 pip3 install -r requirements.txt
+```
+Move into the drones folder
+
+```bash
+cd drones/
 ```
 
 For test begin, run command
@@ -133,10 +137,10 @@ Every test are begined with rigth data. If you want to try any validation only h
         self.assertEqual(Drone.objects.count(), 5)
 ```
 
-In this case if you want a try failed of field serial, change serial in var data, for example next input is one of begined fields  
+In this case if you want a try failed of field serial, change serial in var data, for example next input has 4 erros, serial number alredy exist, weight of model 2 has max of 400g, batery charge cant be upper than 100 and state is out of range.
 
 ```python
-data = {"serial" : "1234567890", "model" : "3", "weight" : "200", "battery" : "70", "state" : "1"} 
+data = {"serial" : "1234567890", "model" : "2", "weight" : "450", "battery" : "120", "state" : "8"} 
 
 ```
 
@@ -174,6 +178,10 @@ Once server is start we have urls for all services, all urls are explain here
 
 ## Login
 
+### Available
+
+All users registers.
+
 ### Request
 
 `POST /login/`
@@ -201,6 +209,10 @@ Once server is start we have urls for all services, all urls are explain here
 ```
 
 ## Register
+
+### Available
+
+All superuser or staff users.
 
 ### Request
 
@@ -231,8 +243,47 @@ Once server is start we have urls for all services, all urls are explain here
     "user_permissions": []
 }
 ```
+## Change my password
+
+### Available
+
+All authenticates users.
+
+### Request
+
+`PUT /change_password/`
+
+```bash
+    curl --header "Authorization: Bearer <ACCESS_TOKEN>" \ 
+    --header "Content-Type: application/json" \
+    --request PUT \
+    --data '{"password1" : "new_password", "password2" : "new_password"}' \
+    http://localhost:8000/cange_password/
+```
+### Response
+
+```json
+{
+    "id": 4, 
+    "last_login": null, 
+    "is_superuser": false, 
+    "username": "usertest", 
+    "first_name": "Test", 
+    "last_name": "User", 
+    "email": "usertest@email.com", 
+    "is_staff": true, 
+    "is_active": true, 
+    "date_joined": "2022-08-10T23:39:41.486247Z", 
+    "groups": [], 
+    "user_permissions": []
+}
+```
 
 ## Logout
+
+### Available
+
+All authenticates users.
 
 ### Request
 
@@ -251,6 +302,10 @@ Once server is start we have urls for all services, all urls are explain here
 ```
 
 ## Drones List
+
+### Available
+
+All authenticates users.
 
 ### Request
 
@@ -293,6 +348,10 @@ Cross-Origin-Opener-Policy: same-origin
 ```
 ## Drones create
 
+### Available
+
+All superuser or staff users.
+
 ### Request
 
 `POST /api/drones/`
@@ -318,6 +377,10 @@ Cross-Origin-Opener-Policy: same-origin
 ```
 
 ## Drone Details
+
+### Available
+
+All authenticates users.
 
 ### Request
 
@@ -357,6 +420,10 @@ Cross-Origin-Opener-Policy: same-origin
 ```
 ## Drone edit
 
+### Available
+
+All superuser or staff users.
+
 ### Request
 
 `PUT /api/drones/id/`
@@ -382,6 +449,10 @@ Cross-Origin-Opener-Policy: same-origin
 ```
 ## Drone delete
 
+### Available
+
+All superuser or staff users.
+
 ### Request
 
 `DELETE /api/drones/id/`
@@ -399,6 +470,10 @@ Cross-Origin-Opener-Policy: same-origin
 ```
 
 ## Drones Availables
+
+### Available
+
+All authenticates users.
 
 ### Request
 
@@ -443,6 +518,10 @@ Cross-Origin-Opener-Policy: same-origin
 
 ## Drone batery status
 
+### Available
+
+All authenticates users.
+
 ### Request
 
 `GET /api/drone_battery/id/`
@@ -465,6 +544,10 @@ Cross-Origin-Opener-Policy: same-origin
 ```
 
 ## Drone medication list
+
+### Available
+
+All authenticates users.
 
 ### Request
 
@@ -521,6 +604,10 @@ Cross-Origin-Opener-Policy: same-origin
 ```
 ## Drone state
 
+### Available
+
+All authenticates users.
+
 ### Request
 
 `POST /api/drone_state/id/`
@@ -545,7 +632,11 @@ Cross-Origin-Opener-Policy: same-origin
 }
 ```
 
-## Drones batery logs
+## All drones batery logs
+
+### Available
+
+All authenticates users.
 
 ### Request
 
@@ -580,6 +671,10 @@ Cross-Origin-Opener-Policy: same-origin
 
 ## Drone batery logs
 
+### Available
+
+All authenticates users.
+
 ### Request
 
 `GET /api/drones_battery_logs/4/`
@@ -612,6 +707,10 @@ Cross-Origin-Opener-Policy: same-origin
 ```
 
 ## Medications List
+
+### Available
+
+All authenticates users.
 
 ### Request
 
@@ -660,6 +759,10 @@ Cross-Origin-Opener-Policy: same-origin
 ```
 ## Medications create
 
+### Available
+
+All superuser or staff users.
+
 ### Request
 
 `POST /api/medications/`
@@ -685,6 +788,10 @@ Cross-Origin-Opener-Policy: same-origin
 
 ## Medication Details
 
+### Available
+
+All authenticates users.
+
 ### Request
 
 `GET /api/medications/id/`
@@ -708,6 +815,10 @@ Cross-Origin-Opener-Policy: same-origin
 }
 ```
 ## Medication edit
+
+### Available
+
+All superuser or staff users.
 
 ### Request
 
@@ -733,6 +844,10 @@ Cross-Origin-Opener-Policy: same-origin
 ```
 ## Medication delete
 
+### Available
+
+All superuser or staff users.
+
 ### Request
 
 `DELETE /api/medications/id/`
@@ -750,6 +865,10 @@ Cross-Origin-Opener-Policy: same-origin
 ```
 
 ## Transportations List
+
+### Available
+
+All authenticates users.
 
 ### Request
 
@@ -837,6 +956,10 @@ Cross-Origin-Opener-Policy: same-origin
 ```
 ## Transportations create
 
+### Available
+
+All superuser or staff users.
+
 ### Request
 
 `POST /api/transportations/`
@@ -875,6 +998,10 @@ Cross-Origin-Opener-Policy: same-origin
 
 ## Transportation Details
 
+### Available
+
+All authenticates users.
+
 ### Request
 
 `GET /api/transportations/id/`
@@ -912,6 +1039,10 @@ Cross-Origin-Opener-Policy: same-origin
 ```
 ## Transportation edit
 
+### Available
+
+All superuser or staff users.
+
 ### Request
 
 `PUT /api/transportations/id/`
@@ -948,6 +1079,10 @@ Cross-Origin-Opener-Policy: same-origin
 }
 ```
 ## Transportation delete
+
+### Available
+
+All superuser or staff users.
 
 ### Request
 

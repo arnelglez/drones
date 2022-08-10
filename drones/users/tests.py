@@ -63,6 +63,16 @@ class UserTestCase(APITestCase):
         self.assertEqual(userModel.objects.count(), 5)
         
         
+    def test_user_change_password(self):
+        '''
+        Ensure we can change our password.
+        '''
+        data = {"password1" : "new_pass_changed", "password2" : "new_pass_changed"}
+        url = reverse('change_password')
+        response = self.client.put(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)   
+        
+        
     def test_user_logout(self):
         '''
         Ensure we can clogout.
