@@ -200,8 +200,8 @@ All users registers.
 
 ```json
 {
-    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjYwMDg2ODg2LCJpYXQiOjE2NjAwODY1ODYsImp0aSI6Ijk0ZDdiZTM2ZTc0YTQzYmJhODY0Mzc5ZDM3MWVlMmMwIiwidXNlcl9pZCI6MX0.kO3-9P0AWcwamZ1XOgQggk_G4oCpNojU8XF67h4POjI", 
-    "referesh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTY2MDE3Mjk4NiwiaWF0IjoxNjYwMDg2NTg2LCJqdGkiOiJiN2JlMjFiOGRhYjA0NWQ4OWNlNTAzMWRhNzE0ZTZmMiIsInVzZXJfaWQiOjF9.cUosxG32Ac6QemsU1k2RR4WNDbIxDW3Pm_R0SXhuayA", 
+    "token": "<ACCESS_TOKEN>", 
+    "referesh": "<REFRESH_TOKEN>", 
     "user": {
                 "id": 2, 
                 "username": "user1", 
